@@ -1,10 +1,19 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import AppShell from "@/components/AppShell"
-import { mockProducts } from "@/data/mockProducts"
 import ProductCard from "@/components/ProductCard"
 import CartBar from "@/components/CartBar"
+
+type Product = {
+  id: string
+  title: string
+  brand: string
+  category: string
+  weight?: string
+  country?: string
+  image?: string
+}
 
 const categories = [
   { id: "cheese", name: "Сыры" },
@@ -14,10 +23,31 @@ const categories = [
 
 export default function CatalogPage() {
   const [category, setCategory] = useState("cheese")
+  const [products, setProducts] = useState<Product[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        setLoading(true)
+
+        const res = await fetch("/api/products")
+        const data = await res.json()
+
+        setProducts(data)
+      } catch (e) {
+        console.error(e)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    load()
+  }, [])
 
   const filtered = useMemo(() => {
-    return mockProducts.filter((p) => p.category === category)
-  }, [category])
+    return products.filter((p) => p.category === category)
+  }, [products, category])
 
   return (
     <AppShell>
@@ -31,7 +61,7 @@ export default function CatalogPage() {
           </h1>
 
           <p className="text-xs text-gray-500">
-            Сыры, молочка, колбасы
+            Живые данные из Excel
           </p>
         </div>
 
@@ -42,7 +72,7 @@ export default function CatalogPage() {
               key={c.id}
               onClick={() => setCategory(c.id)}
               className={`
-                px-3 py-1 rounded-full text-xs border whitespace-nowrap transition
+                px-3 py-1 rounded-full text-xs border whitespace-nowrap
                 ${category === c.id
                   ? "bg-[#0B1F3A] text-white border-[#0B1F3A]"
                   : "bg-white text-gray-600 border-[#E2E8F0]"}
@@ -53,21 +83,30 @@ export default function CatalogPage() {
           ))}
         </div>
 
+        {/* LOADING */}
+        {loading && (
+          <div className="text-sm text-gray-500 mt-4">
+            Загрузка товаров...
+          </div>
+        )}
+
         {/* GRID */}
-        <div className="grid grid-cols-2 gap-3 mt-3">
+        {!loading && (
+          <div className="grid grid-cols-2 gap-3 mt-3">
 
-          {filtered.map((p) => (
-            <ProductCard
-              key={p.id}
-              id={p.id}
-              title={p.title}
-              brand={p.brand}
-              weight={p.weight}
-              country={p.country}
-            />
-          ))}
+            {filtered.map((p) => (
+              <ProductCard
+                key={p.id}
+                id={String(p.id)}
+                title={p.title}
+                brand={p.brand}
+                weight={p.weight}
+                country={p.country}
+              />
+            ))}
 
-        </div>
+          </div>
+        )}
 
       </div>
 
