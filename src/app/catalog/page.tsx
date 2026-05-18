@@ -4,6 +4,7 @@ import { useMemo, useState } from "react"
 import AppShell from "@/components/AppShell"
 import { mockProducts } from "@/data/mockProducts"
 import ProductCard from "@/components/ProductCard"
+import CartBar from "@/components/CartBar"
 
 const categories = [
   { id: "cheese", name: "Сыры" },
@@ -20,13 +21,15 @@ export default function CatalogPage() {
 
   return (
     <AppShell>
-      <div className="p-3">
+
+      <div className="p-3 pb-28">
 
         {/* HEADER */}
         <div className="mb-3">
           <h1 className="text-[#0B1F3A] text-xl font-semibold">
             Каталог
           </h1>
+
           <p className="text-xs text-gray-500">
             Сыры, молочка, колбасы
           </p>
@@ -39,10 +42,10 @@ export default function CatalogPage() {
               key={c.id}
               onClick={() => setCategory(c.id)}
               className={`
-                px-3 py-1 rounded-full text-xs border whitespace-nowrap
+                px-3 py-1 rounded-full text-xs border whitespace-nowrap transition
                 ${category === c.id
-                  ? "bg-[#0B1F3A] text-white"
-                  : "bg-white text-gray-600"}
+                  ? "bg-[#0B1F3A] text-white border-[#0B1F3A]"
+                  : "bg-white text-gray-600 border-[#E2E8F0]"}
               `}
             >
               {c.name}
@@ -52,6 +55,7 @@ export default function CatalogPage() {
 
         {/* GRID */}
         <div className="grid grid-cols-2 gap-3 mt-3">
+
           {filtered.map((p) => (
             <ProductCard
               key={p.id}
@@ -62,9 +66,13 @@ export default function CatalogPage() {
               country={p.country}
             />
           ))}
+
         </div>
 
       </div>
+
+      <CartBar />
+
     </AppShell>
   )
 }
