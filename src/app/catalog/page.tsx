@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react"
 import AppShell from "@/components/AppShell"
 import { mockProducts } from "@/data/mockProducts"
+import ProductCard from "@/components/ProductCard"
 
 const categories = [
   { id: "cheese", name: "Сыры" },
@@ -51,38 +52,16 @@ export default function CatalogPage() {
 
         {/* GRID */}
         <div className="grid grid-cols-2 gap-3 mt-3">
-
           {filtered.map((p) => (
-            <div
+            <ProductCard
               key={p.id}
-              className="bg-white border border-[#E2E8F0] rounded-xl p-3"
-            >
-
-              {/* IMAGE PLACEHOLDER */}
-              <div className="h-20 bg-gray-100 rounded-lg mb-2" />
-
-              {/* TITLE */}
-              <div className="text-sm font-medium text-[#1A1A1A]">
-                {p.title}
-              </div>
-
-              {/* META */}
-              <div className="text-[11px] text-gray-500 mt-1">
-                {p.brand} · {p.weight}
-              </div>
-
-              <div className="text-[11px] text-gray-400">
-                {p.country}
-              </div>
-
-              {/* ACTION */}
-              <button className="mt-2 w-full bg-[#0B1F3A] text-white text-xs py-1.5 rounded-lg">
-                Добавить
-              </button>
-
-            </div>
+              id={p.id}
+              title={p.title}
+              brand={p.brand}
+              weight={p.weight}
+              country={p.country}
+            />
           ))}
-
         </div>
 
       </div>
