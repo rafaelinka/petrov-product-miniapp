@@ -10,6 +10,7 @@ type Product = {
   title: string
   brand: string
   category: string
+  subcategory?: string
   weight?: string
   country?: string
   image?: string
@@ -23,14 +24,15 @@ const categories = [
 
 export default function CatalogPage() {
   const [category, setCategory] = useState("cheese")
+  const [subcategory, setSubcategory] = useState("")
+  const [search, setSearch] = useState("")
+
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const load = async () => {
       try {
-        setLoading(true)
-
         const res = await fetch("/api/products")
         const data = await res.json()
 
@@ -45,9 +47,38 @@ export default function CatalogPage() {
     load()
   }, [])
 
-  const filtered = useMemo(() => {
-    return products.filter((p) => p.category === category)
+  const subcategories = useMemo(() => {
+    const current = products.filter(
+      (p) => p.category === category
+    )
+
+    return [...new Set(current.map((p) => p.subcategory))]
   }, [products, category])
+
+  const filtered = useMemo(() => {
+    return products.filter((p) => {
+      const categoryMatch =
+        p.category === category
+
+      const subcategoryMatch =
+        !subcategory ||
+        p.subcategory === subcategory
+
+      const searchMatch =
+        p.title
+          .toLowerCase()
+          .includes(search.toLowerCase()) ||
+        p.brand
+          .toLowerCase()
+          .includes(search.toLowerCase())
+
+      return (
+        categoryMatch &&
+        subcategoryMatch &&
+        searchMatch
+      )
+    })
+  }, [products, category, subcategory, search])
 
   return (
     <AppShell>
@@ -61,7 +92,7 @@ export default function CatalogPage() {
           </h1>
 
           <p className="text-xs text-gray-500">
-            Живые данные из Excel
+            Оптовый ассортимент
           </p>
         </div>
 
@@ -70,7 +101,10 @@ export default function CatalogPage() {
           {categories.map((c) => (
             <button
               key={c.id}
-              onClick={() => setCategory(c.id)}
+              onClick={() => {
+                setCategory(c.id)
+                setSubcategory("")
+              }}
               className={`
                 px-3 py-1 rounded-full text-xs border whitespace-nowrap
                 ${category === c.id
@@ -83,15 +117,74 @@ export default function CatalogPage() {
           ))}
         </div>
 
+        {/* SEARCH */}
+        <div className="mt-3">
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Поиск товара или бренда"
+            className="
+              w-full
+              bg-white
+              border
+              border-[#E2E8F0]
+              rounded-2xl
+              px-4
+              py-3
+              text-sm
+              outline-none
+            "
+          />
+        </div>
+
+        {/* SUBCATEGORIES */}
+        <div className="flex gap-2 overflow-x-auto mt-3 pb-2">
+
+          <button
+            onClick={() => setSubcategory("")}
+            className={`
+              px-3 py-1 rounded-full text-xs border whitespace-nowrap
+              ${subcategory === ""
+                ? "bg-[#2C5D7A] text-white border-[#2C5D7A]"
+                : "bg-white text-gray-600 border-[#E2E8F0]"}
+            `}
+          >
+            Все
+          </button>
+
+          {subcategories.map((s) => (
+            <button
+              key={String(s)}
+              onClick={() => setSubcategory(String(s))}
+              className={`
+                px-3 py-1 rounded-full text-xs border whitespace-nowrap
+                ${subcategory === s
+                  ? "bg-[#2C5D7A] text-white border-[#2C5D7A]"
+                  : "bg-white text-gray-600 border-[#E2E8F0]"}
+              `}
+            >
+              {s}
+            </button>
+          ))}
+
+        </div>
+
         {/* LOADING */}
         {loading && (
-          <div className="text-sm text-gray-500 mt-4">
-            Загрузка товаров...
+          <div className="mt-4 text-sm text-gray-500">
+            Загрузка каталога...
+          </div>
+        )}
+
+        {/* EMPTY */}
+        {!loading && filtered.length === 0 && (
+          <div className="mt-10 text-center text-sm text-gray-500">
+            Ничего не найдено
           </div>
         )}
 
         {/* GRID */}
-        {!loading && (
+        {!loading && filtered.length > 0 && (
           <div className="grid grid-cols-2 gap-3 mt-3">
 
             {filtered.map((p) => (
@@ -102,6 +195,7 @@ export default function CatalogPage() {
                 brand={p.brand}
                 weight={p.weight}
                 country={p.country}
+                image={p.image}
               />
             ))}
 
