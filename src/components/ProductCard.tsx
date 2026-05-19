@@ -42,17 +42,22 @@ export default function ProductCard({
     >
 
       {/* IMAGE */}
-      <div className="relative h-40 bg-[#F5F7FA]">
+      <div className="bg-[#F5F7FA]">
 
         {image ? (
           <Image
             src={`/products/${image}.jpg`}
             alt={title}
-            fill
-            className="object-cover"
+            width={400}
+            height={300}
+            className="
+              w-full
+              h-40
+              object-cover
+            "
           />
         ) : (
-          <div className="h-full flex items-center justify-center text-xs text-gray-400">
+          <div className="h-40 flex items-center justify-center text-xs text-gray-400">
             Нет фото
           </div>
         )}
