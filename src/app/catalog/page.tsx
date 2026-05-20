@@ -1,7 +1,8 @@
 "use client"
 
 import { useEffect, useMemo, useState } from "react"
-import AppShell from "@/components/AppShell"
+import Link from "next/link"
+
 import ProductCard from "@/components/ProductCard"
 import CartBar from "@/components/CartBar"
 
@@ -16,53 +17,51 @@ type Product = {
   image?: string
 }
 
-const categories = [
-  { id: "cheese", name: "Сыры" },
-  { id: "milk", name: "Молочка" },
-  { id: "meat", name: "Колбасы" },
-]
-
 export default function CatalogPage() {
-  const [category, setCategory] = useState("cheese")
-  const [subcategory, setSubcategory] = useState("")
+  const [products, setProducts] = useState<Product[]>([])
+
+  const [category, setCategory] = useState("Сыры")
+
+  const [subcategory, setSubcategory] = useState("Все")
+
   const [search, setSearch] = useState("")
 
-  const [products, setProducts] = useState<Product[]>([])
-  const [loading, setLoading] = useState(true)
-
   useEffect(() => {
-    const load = async () => {
-      try {
-        const res = await fetch("/api/products")
-        const data = await res.json()
-
+    fetch("/api/products")
+      .then((res) => res.json())
+      .then((data) => {
         setProducts(data)
-      } catch (e) {
-        console.error(e)
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    load()
+      })
   }, [])
 
+  const categories = useMemo(() => {
+    return [...new Set(products.map((p) => p.category))]
+  }, [products])
+
   const subcategories = useMemo(() => {
-    const current = products.filter(
+    const filtered = products.filter(
       (p) => p.category === category
     )
 
-    return [...new Set(current.map((p) => p.subcategory))]
+    return [
+      "Все",
+      ...new Set(
+        filtered
+          .map((p) => p.subcategory)
+          .filter(Boolean)
+      ),
+    ]
   }, [products, category])
 
-  const filtered = useMemo(() => {
+  const filteredProducts = useMemo(() => {
     return products.filter((p) => {
       const categoryMatch =
         p.category === category
 
       const subcategoryMatch =
-        !subcategory ||
-        p.subcategory === subcategory
+        subcategory === "Все"
+          ? true
+          : p.subcategory === subcategory
 
       const searchMatch =
         p.title
@@ -78,134 +77,187 @@ export default function CatalogPage() {
         searchMatch
       )
     })
-  }, [products, category, subcategory, search])
+  }, [
+    products,
+    category,
+    subcategory,
+    search,
+  ])
 
   return (
-    <AppShell>
+    <main className="min-h-screen bg-[#F5F7FA] flex justify-center">
 
-      <div className="p-3 pb-28">
+      <div className="w-full max-w-[420px]">
 
-        {/* HEADER */}
-        <div className="mb-3">
-          <h1 className="text-[#0B1F3A] text-xl font-semibold">
-            Каталог
-          </h1>
+        {/* STICKY HEADER */}
+        <div className="sticky top-0 z-40 bg-[#F5F7FA]">
 
-          <p className="text-xs text-gray-500">
-            Оптовый ассортимент
-          </p>
-        </div>
-
-        {/* CATEGORIES */}
-        <div className="flex gap-2 overflow-x-auto pb-2">
-          {categories.map((c) => (
-            <button
-              key={c.id}
-              onClick={() => {
-                setCategory(c.id)
-                setSubcategory("")
-              }}
-              className={`
-                px-3 py-1 rounded-full text-xs border whitespace-nowrap
-                ${category === c.id
-                  ? "bg-[#0B1F3A] text-white border-[#0B1F3A]"
-                  : "bg-white text-gray-600 border-[#E2E8F0]"}
-              `}
-            >
-              {c.name}
-            </button>
-          ))}
-        </div>
-
-        {/* SEARCH */}
-        <div className="mt-3">
-          <input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Поиск товара или бренда"
+          {/* TOP BAR */}
+          <div
             className="
-              w-full
               bg-white
-              border
-              border-[#E2E8F0]
-              rounded-2xl
               px-4
               py-3
-              text-sm
-              outline-none
+              border-b
+              border-[#E2E8F0]
+              flex
+              items-center
+              justify-between
             "
-          />
-        </div>
-
-        {/* SUBCATEGORIES */}
-        <div className="flex gap-2 overflow-x-auto mt-3 pb-2">
-
-          <button
-            onClick={() => setSubcategory("")}
-            className={`
-              px-3 py-1 rounded-full text-xs border whitespace-nowrap
-              ${subcategory === ""
-                ? "bg-[#2C5D7A] text-white border-[#2C5D7A]"
-                : "bg-white text-gray-600 border-[#E2E8F0]"}
-            `}
           >
-            Все
-          </button>
 
-          {subcategories.map((s) => (
-            <button
-              key={String(s)}
-              onClick={() => setSubcategory(String(s))}
-              className={`
-                px-3 py-1 rounded-full text-xs border whitespace-nowrap
-                ${subcategory === s
-                  ? "bg-[#2C5D7A] text-white border-[#2C5D7A]"
-                  : "bg-white text-gray-600 border-[#E2E8F0]"}
-              `}
+            <Link
+              href="/"
+              className="
+                text-sm
+                text-[#0B1F3A]
+                font-medium
+              "
             >
-              {s}
-            </button>
-          ))}
+              ← Главная
+            </Link>
 
-        </div>
+            <div className="text-sm font-semibold text-[#0B1F3A]">
+              Каталог
+            </div>
 
-        {/* LOADING */}
-        {loading && (
-          <div className="mt-4 text-sm text-gray-500">
-            Загрузка каталога...
+            <div className="w-[70px]" />
+
           </div>
-        )}
 
-        {/* EMPTY */}
-        {!loading && filtered.length === 0 && (
-          <div className="mt-10 text-center text-sm text-gray-500">
-            Ничего не найдено
-          </div>
-        )}
+          {/* CATEGORY TABS */}
+          <div
+            className="
+              flex
+              gap-2
+              overflow-x-auto
+              px-3
+              py-3
+              bg-white
+              border-b
+              border-[#E2E8F0]
+            "
+          >
 
-        {/* GRID */}
-        {!loading && filtered.length > 0 && (
-          <div className="grid grid-cols-2 gap-3 mt-3">
+            {categories.map((c) => (
+              <button
+                key={c}
+                onClick={() => {
+                  setCategory(c)
+                  setSubcategory("Все")
+                }}
+                className={`
+                  px-4
+                  py-2
+                  rounded-full
+                  text-sm
+                  whitespace-nowrap
+                  transition-all
+                  border
 
-            {filtered.map((p) => (
-              <ProductCard
-                key={p.id}
-                id={String(p.id)}
-                title={p.title}
-                brand={p.brand}
-                weight={p.weight}
-                country={p.country}
-                image={p.image}
-              />
+                  ${
+                    category === c
+                      ? "bg-[#0B1F3A] text-white border-[#0B1F3A]"
+                      : "bg-white text-[#0B1F3A] border-[#E2E8F0]"
+                  }
+                `}
+              >
+                {c}
+              </button>
             ))}
 
           </div>
-        )}
+
+          {/* SEARCH */}
+          <div className="bg-white px-3 py-3 border-b border-[#E2E8F0]">
+
+            <input
+              type="text"
+              placeholder="Поиск товара или бренда"
+              value={search}
+              onChange={(e) =>
+                setSearch(e.target.value)
+              }
+              className="
+                w-full
+                h-11
+                rounded-2xl
+                bg-[#F5F7FA]
+                px-4
+                text-sm
+                outline-none
+                border
+                border-transparent
+                focus:border-[#0B1F3A]
+              "
+            />
+
+          </div>
+
+          {/* SUBCATEGORY */}
+          <div
+            className="
+              flex
+              gap-2
+              overflow-x-auto
+              px-3
+              py-3
+              bg-white
+              border-b
+              border-[#E2E8F0]
+            "
+          >
+
+            {subcategories.map((s) => (
+              <button
+                key={s}
+                onClick={() =>
+                  setSubcategory(s || "Все")
+                }
+                className={`
+                  px-3
+                  py-2
+                  rounded-full
+                  text-xs
+                  whitespace-nowrap
+                  transition-all
+
+                  ${
+                    subcategory === s
+                      ? "bg-[#2C5D7A] text-white"
+                      : "bg-[#F5F7FA] text-[#0B1F3A]"
+                  }
+                `}
+              >
+                {s}
+              </button>
+            ))}
+
+          </div>
+
+        </div>
+
+        {/* GRID */}
+        <div className="grid grid-cols-2 gap-3 p-3 pb-28">
+
+          {filteredProducts.map((product) => (
+            <ProductCard
+              key={product.id}
+              id={product.id}
+              title={product.title}
+              brand={product.brand}
+              weight={product.weight}
+              country={product.country}
+              image={product.image}
+            />
+          ))}
+
+        </div>
+
+        <CartBar />
 
       </div>
 
-      <CartBar />
-
-    </AppShell>
+    </main>
   )
 }
