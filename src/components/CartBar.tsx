@@ -25,30 +25,50 @@ export default function CartBar() {
   if (items.length === 0) return null
 
   async function handleSubmit() {
-    const payload = {
-      createdAt: new Date().toISOString(),
+    try {
+      const payload = {
+        createdAt: new Date().toISOString(),
 
-      items: items.map((item) => ({
-        id: item.id,
-        title: item.title,
-        qty: item.qty,
-      })),
+        items: items.map((item) => ({
+          id: item.id,
+          title: item.title,
+          qty: item.qty,
+        })),
 
-      totalItems: total,
+        totalItems: total,
 
-      comment,
+        comment,
+      }
+
+      const res = await fetch("/api/order", {
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/json",
+        },
+
+        body: JSON.stringify(payload),
+      })
+
+      const data = await res.json()
+
+      if (!data.success) {
+        alert("Ошибка отправки")
+        return
+      }
+
+      alert("Заявка отправлена")
+
+      clearCart()
+
+      setComment("")
+
+      setOpen(false)
+    } catch (error) {
+      console.error(error)
+
+      alert("Ошибка сервера")
     }
-
-    console.log("ORDER PAYLOAD")
-    console.log(payload)
-
-    alert("Заявка подготовлена")
-
-    /*
-      СЛЕДУЮЩИЙ ЭТАП:
-      fetch("/api/order")
-      → MAX webhook
-    */
   }
 
   return (
