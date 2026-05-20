@@ -3,7 +3,7 @@
 import Image from "next/image"
 import { useState } from "react"
 import { useCartStore } from "@/store/cartStore"
-import { getCountryFlag } from "@/lib/countryFlag"
+import { getCountryFlag, getCountryLabel } from "@/lib/countryFlag"
 
 type Props = {
   id: string
@@ -26,9 +26,10 @@ export default function ProductCard({
 
   const cartItem = items.find((i) => i.id === id)
 
-  const flag = getCountryFlag(country)
-
   const [openPreview, setOpenPreview] = useState(false)
+
+  const flag = getCountryFlag(country)
+  const countryLabel = getCountryLabel(country)
 
   return (
     <>
@@ -58,26 +59,22 @@ export default function ProductCard({
         {/* CONTENT */}
         <div className="p-3">
 
-          {/* TITLE */}
-          <div className="min-h-[42px]">
-            <div className="text-sm font-semibold text-[#1A1A1A] line-clamp-2">
-              {title}
-            </div>
+          <div className="text-sm font-semibold text-[#1A1A1A] line-clamp-2">
+            {title}
           </div>
 
-          {/* BRAND */}
           <div className="text-xs text-gray-500 mt-1">
             {brand}
           </div>
 
-          {/* META */}
-          <div className="flex items-center justify-between mt-3 text-xs text-gray-500">
-
+          {/* COUNTRY + FLAG */}
+          <div className="flex items-center justify-between mt-2 text-xs text-gray-500">
             <div>{weight}</div>
 
-            {/* FLAG */}
-            <div className="text-base">{flag}</div>
-
+            <div className="flex items-center gap-1">
+              <span>{flag}</span>
+              <span>{countryLabel}</span>
+            </div>
           </div>
 
           {/* ACTION */}
@@ -86,33 +83,29 @@ export default function ProductCard({
             {!cartItem ? (
               <button
                 onClick={() =>
-                  addItem({
-                    id,
-                    title,
-                    qty: 1,
-                  })
+                  addItem({ id, title, qty: 1 })
                 }
                 className="w-full bg-[#0B1F3A] text-white py-2.5 rounded-xl text-sm font-medium"
               >
                 В заявку
               </button>
             ) : (
-              <div className="h-[42px] rounded-xl border border-[#E2E8F0] flex items-center justify-between px-2">
+              <div className="h-[42px] rounded-xl border flex items-center justify-between px-2">
 
                 <button
                   onClick={() => decreaseQty(id)}
-                  className="w-8 h-8 rounded-lg bg-[#F5F7FA] text-[#0B1F3A] text-lg font-medium"
+                  className="w-8 h-8 bg-[#F5F7FA] rounded-lg"
                 >
                   −
                 </button>
 
-                <div className="text-sm font-semibold text-[#0B1F3A]">
+                <div className="font-semibold text-sm">
                   {cartItem.qty}
                 </div>
 
                 <button
                   onClick={() => increaseQty(id)}
-                  className="w-8 h-8 rounded-lg bg-[#0B1F3A] text-white text-lg font-medium"
+                  className="w-8 h-8 bg-[#0B1F3A] text-white rounded-lg"
                 >
                   +
                 </button>
@@ -125,7 +118,7 @@ export default function ProductCard({
         </div>
       </div>
 
-      {/* 🔥 PREVIEW MODAL (заготовка под следующий шаг) */}
+      {/* MODAL (ТОЛЬКО ПРОСМОТР) */}
       {openPreview && (
         <div
           className="fixed inset-0 bg-black/60 flex items-end justify-center z-[100]"
@@ -136,78 +129,49 @@ export default function ProductCard({
             onClick={(e) => e.stopPropagation()}
           >
 
-            {/* IMAGE BIG */}
-            <div className="rounded-2xl overflow-hidden bg-[#F5F7FA]">
-              {image ? (
-                <Image
-                  src={`/products/${image}`}
-                  alt={title}
-                  width={800}
-                  height={600}
-                  className="w-full h-60 object-cover"
-                />
-              ) : (
-                <div className="h-60 flex items-center justify-center text-gray-400">
-                  Нет фото
-                </div>
-              )}
+            {/* CLOSE */}
+            <div className="flex justify-between items-center mb-3">
+              <div className="font-semibold text-[#0B1F3A]">
+                Товар
+              </div>
+
+              <button
+                onClick={() => setOpenPreview(false)}
+                className="w-8 h-8 rounded-full bg-[#F5F7FA]"
+              >
+                ✕
+              </button>
             </div>
+
+            {/* IMAGE */}
+            {image && (
+              <Image
+                src={`/products/${image}`}
+                alt={title}
+                width={800}
+                height={600}
+                className="w-full h-60 object-cover rounded-2xl"
+              />
+            )}
 
             {/* INFO */}
-            <div className="mt-4">
+            <div className="mt-3">
+              <div className="text-lg font-semibold">{title}</div>
+              <div className="text-sm text-gray-500">{brand}</div>
 
-              <div className="text-lg font-semibold text-[#0B1F3A]">
-                {title}
-              </div>
-
-              <div className="text-sm text-gray-500 mt-1">
-                {brand}
-              </div>
-
-              <div className="flex items-center justify-between mt-3 text-sm text-gray-500">
+              <div className="flex items-center justify-between mt-2 text-sm text-gray-500">
                 <div>{weight}</div>
-                <div className="text-xl">{flag}</div>
-              </div>
 
+                <div className="flex gap-1 items-center">
+                  <span>{flag}</span>
+                  <span>{countryLabel}</span>
+                </div>
+              </div>
             </div>
 
-            {/* ACTION */}
-            <div className="mt-5">
-
-              {!cartItem ? (
-                <button
-                  onClick={() => {
-                    addItem({ id, title, qty: 1 })
-                    setOpenPreview(false)
-                  }}
-                  className="w-full bg-[#0B1F3A] text-white py-3 rounded-2xl font-medium"
-                >
-                  Добавить в заявку
-                </button>
-              ) : (
-                <div className="flex items-center justify-between border rounded-2xl px-3 py-2">
-
-                  <button
-                    onClick={() => decreaseQty(id)}
-                    className="w-10 h-10 bg-[#F5F7FA] rounded-xl"
-                  >
-                    −
-                  </button>
-
-                  <div className="font-semibold">
-                    {cartItem.qty}
-                  </div>
-
-                  <button
-                    onClick={() => increaseQty(id)}
-                    className="w-10 h-10 bg-[#0B1F3A] text-white rounded-xl"
-                  >
-                    +
-                  </button>
-
-                </div>
-              )}
-
+            {/* NO ADD BUTTON HERE */}
+            <div className="mt-4 text-xs text-gray-400 text-center">
+              Добавление в заявку доступно только из карточки
             </div>
 
           </div>

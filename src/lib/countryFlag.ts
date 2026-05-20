@@ -1,43 +1,25 @@
 // src/lib/countryFlag.ts
 
-export type CountryCode = "ru" | "by" | "ar"
-
 export function getCountryFlag(country?: string) {
-  if (!country) return ""
+  if (!country) return "🏳️"
 
-  const code = country.toLowerCase()
+  const c = country.toLowerCase().trim()
 
-  switch (code) {
-    case "ru":
-    case "russia":
-      return "🇷🇺"
+  if (c === "ru" || c === "russia" || c === "россия") return "🇷🇺"
+  if (c === "by" || c === "belarus" || c === "беларусь") return "🇧🇾"
+  if (c === "ar" || c === "argentina" || c === "аргентина") return "🇦🇷"
 
-    case "by":
-    case "belarus":
-      return "🇧🇾"
-
-    case "ar":
-    case "argentina":
-      return "🇦🇷"
-
-    default:
-      return ""
-  }
+  return "🌍"
 }
 
 export function getCountryLabel(country?: string) {
   if (!country) return ""
 
-  const code = country.toLowerCase()
+  const c = country.toLowerCase().trim()
 
-  switch (code) {
-    case "ru":
-      return "Россия"
-    case "by":
-      return "Беларусь"
-    case "ar":
-      return "Аргентина"
-    default:
-      return country
-  }
+  if (c === "ru" || c === "russia") return "Россия"
+  if (c === "by" || c === "belarus") return "Беларусь"
+  if (c === "ar" || c === "argentina") return "Аргентина"
+
+  return country
 }
