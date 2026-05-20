@@ -1,18 +1,55 @@
 "use client"
 
-import { useState } from "react"
+import { useMemo, useState } from "react"
+
 import { useCartStore } from "@/store/cartStore"
 
 export default function CartBar() {
-  const { items, clearCart } = useCartStore()
+  const {
+    items,
+    clearCart,
+    increaseQty,
+    decreaseQty,
+  } = useCartStore()
 
   const [open, setOpen] = useState(false)
 
-  const total = items.reduce((acc, item) => {
-    return acc + item.qty
-  }, 0)
+  const [comment, setComment] = useState("")
+
+  const total = useMemo(() => {
+    return items.reduce((acc, item) => {
+      return acc + item.qty
+    }, 0)
+  }, [items])
 
   if (items.length === 0) return null
+
+  async function handleSubmit() {
+    const payload = {
+      createdAt: new Date().toISOString(),
+
+      items: items.map((item) => ({
+        id: item.id,
+        title: item.title,
+        qty: item.qty,
+      })),
+
+      totalItems: total,
+
+      comment,
+    }
+
+    console.log("ORDER PAYLOAD")
+    console.log(payload)
+
+    alert("Заявка подготовлена")
+
+    /*
+      СЛЕДУЮЩИЙ ЭТАП:
+      fetch("/api/order")
+      → MAX webhook
+    */
+  }
 
   return (
     <>
@@ -36,13 +73,15 @@ export default function CartBar() {
         >
 
           <div>
+
             <div className="text-sm font-medium">
-              Товаров в заявке
+              Заявка
             </div>
 
             <div className="text-xs text-gray-300">
               {total} шт.
             </div>
+
           </div>
 
           <button
@@ -57,7 +96,7 @@ export default function CartBar() {
               font-semibold
             "
           >
-            Корзина
+            Открыть
           </button>
 
         </div>
@@ -75,7 +114,7 @@ export default function CartBar() {
               bg-white
               rounded-t-3xl
               p-4
-              max-h-[85vh]
+              max-h-[90vh]
               overflow-y-auto
             "
           >
@@ -84,6 +123,7 @@ export default function CartBar() {
             <div className="flex items-center justify-between">
 
               <div>
+
                 <h2 className="text-lg font-semibold text-[#0B1F3A]">
                   Заявка
                 </h2>
@@ -91,6 +131,7 @@ export default function CartBar() {
                 <p className="text-xs text-gray-500">
                   Проверьте список товаров
                 </p>
+
               </div>
 
               <button
@@ -119,20 +160,70 @@ export default function CartBar() {
                     border-[#E2E8F0]
                     rounded-2xl
                     p-3
-                    flex
-                    items-center
-                    justify-between
                   "
                 >
 
-                  <div>
-                    <div className="text-sm font-medium text-[#1A1A1A]">
-                      {item.title}
+                  <div className="flex items-start justify-between gap-3">
+
+                    <div>
+
+                      <div className="text-sm font-medium text-[#1A1A1A]">
+                        {item.title}
+                      </div>
+
+                      <div className="text-xs text-gray-500 mt-1">
+                        Количество: {item.qty}
+                      </div>
+
                     </div>
 
-                    <div className="text-xs text-gray-500 mt-1">
-                      Количество: {item.qty}
+                    {/* QTY */}
+                    <div
+                      className="
+                        flex
+                        items-center
+                        gap-2
+                      "
+                    >
+
+                      <button
+                        onClick={() =>
+                          decreaseQty(item.id)
+                        }
+                        className="
+                          w-8
+                          h-8
+                          rounded-lg
+                          bg-[#F5F7FA]
+                          text-[#0B1F3A]
+                          text-lg
+                        "
+                      >
+                        −
+                      </button>
+
+                      <div className="text-sm font-semibold min-w-[16px] text-center">
+                        {item.qty}
+                      </div>
+
+                      <button
+                        onClick={() =>
+                          increaseQty(item.id)
+                        }
+                        className="
+                          w-8
+                          h-8
+                          rounded-lg
+                          bg-[#0B1F3A]
+                          text-white
+                          text-lg
+                        "
+                      >
+                        +
+                      </button>
+
                     </div>
+
                   </div>
 
                 </div>
@@ -140,10 +231,64 @@ export default function CartBar() {
 
             </div>
 
+            {/* COMMENT */}
+            <div className="mt-5">
+
+              <div className="text-sm font-medium text-[#0B1F3A] mb-2">
+                Комментарий
+              </div>
+
+              <textarea
+                placeholder="Например: нужна доставка в четверг"
+                value={comment}
+                onChange={(e) =>
+                  setComment(e.target.value)
+                }
+                className="
+                  w-full
+                  min-h-[100px]
+                  rounded-2xl
+                  border
+                  border-[#E2E8F0]
+                  p-3
+                  text-sm
+                  outline-none
+                  resize-none
+                  focus:border-[#0B1F3A]
+                "
+              />
+
+            </div>
+
+            {/* SUMMARY */}
+            <div
+              className="
+                mt-5
+                bg-[#F5F7FA]
+                rounded-2xl
+                p-4
+              "
+            >
+
+              <div className="flex justify-between text-sm">
+
+                <div className="text-gray-500">
+                  Всего товаров
+                </div>
+
+                <div className="font-semibold text-[#0B1F3A]">
+                  {total}
+                </div>
+
+              </div>
+
+            </div>
+
             {/* ACTIONS */}
             <div className="mt-5 space-y-2">
 
               <button
+                onClick={handleSubmit}
                 className="
                   w-full
                   bg-[#D64545]
