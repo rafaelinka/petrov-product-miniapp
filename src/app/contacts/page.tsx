@@ -31,8 +31,8 @@ export default function ContactsPage() {
       description: "Помощь по заказам",
       people: [
         {
-          name: "Мария",
-          phone: "+49 170 22222222",
+          name: "Рафаэль",
+          phone: "+79777455770",
         },
       ],
     },
