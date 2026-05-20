@@ -20,7 +20,7 @@ type Product = {
 export default function CatalogPage() {
   const [products, setProducts] = useState<Product[]>([])
 
-  const [category, setCategory] = useState("Сыры")
+  const [category, setCategory] = useState("Все")
 
   const [subcategory, setSubcategory] = useState("Все")
 
@@ -34,14 +34,23 @@ export default function CatalogPage() {
       })
   }, [])
 
+  // CATEGORIES
   const categories = useMemo(() => {
-    return [...new Set(products.map((p) => p.category))]
+    const unique = [
+      ...new Set(products.map((p) => p.category)),
+    ]
+
+    return ["Все", ...unique]
   }, [products])
 
+  // SUBCATEGORIES
   const subcategories = useMemo(() => {
-    const filtered = products.filter(
-      (p) => p.category === category
-    )
+    const filtered =
+      category === "Все"
+        ? products
+        : products.filter(
+            (p) => p.category === category
+          )
 
     return [
       "Все",
@@ -53,10 +62,13 @@ export default function CatalogPage() {
     ]
   }, [products, category])
 
+  // FILTERED PRODUCTS
   const filteredProducts = useMemo(() => {
     return products.filter((p) => {
       const categoryMatch =
-        p.category === category
+        category === "Все"
+          ? true
+          : p.category === category
 
       const subcategoryMatch =
         subcategory === "Все"
