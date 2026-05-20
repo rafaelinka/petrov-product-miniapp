@@ -1,41 +1,42 @@
-export async function sendToOperator(text: string) {
-  const token = process.env.MAX_BOT_TOKEN
-  const chatId = process.env.MAX_OPERATOR_CHAT_ID
+export async function sendToOperator(chatId: string, text: string) {
+  const token = process.env.MAX_TOKEN
+
+  if (!token) {
+    throw new Error("MAX_TOKEN is not defined in env")
+  }
 
   const url = `https://platform-api.max.ru/messages?chat_id=${chatId}`
 
   const res = await fetch(url, {
     method: "POST",
     headers: {
-      Authorization: token, // ❗ без Bearer
+      // ⚠️ MAX требует именно raw token (без Bearer)
+      Authorization: token,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({
-      text,
-    }),
+    body: JSON.stringify({ text }),
   })
 
-  const raw = await res.text()
+  const rawText = await res.text()
 
-  console.log("[MAX STATUS]", res.status)
-  console.log("[MAX RESPONSE]", raw)
-
-  // ❗ MAX может вернуть 200 даже с полезной ошибкой внутри
-  let data: any = null
-
+  let data: any
   try {
-    data = JSON.parse(raw)
+    data = JSON.parse(rawText)
   } catch {
-    data = null
+    data = rawText
   }
 
-  // ❗ считаем ошибкой только реальный HTTP fail
-  if (res.status >= 400) {
-    throw new Error(`MAX error ${res.status}: ${raw}`)
+  console.log("[MAX RESPONSE]", data)
+
+  // ❗ MAX часто возвращает 200 даже при ошибке внутри body
+  if (data?.code) {
+    console.log("[MAX API ERROR]", data)
+    throw new Error(`MAX API error: ${JSON.stringify(data)}`)
   }
 
-  return {
-    ok: true,
-    data,
+  if (!res.ok) {
+    throw new Error(`HTTP error ${res.status}: ${rawText}`)
   }
+
+  return data
 }

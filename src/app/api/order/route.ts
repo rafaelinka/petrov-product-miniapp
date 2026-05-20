@@ -1,41 +1,28 @@
 import { sendToOperator } from "@/lib/sendToOperator"
-import { CartItem } from "@/types/cart"
 
 export async function POST(req: Request) {
   try {
     const body = await req.json()
 
-    const { items, comment } = body
+    const chatId = process.env.MAX_CHAT_ID!
 
-    if (!Array.isArray(items) || items.length === 0) {
-      return Response.json({ ok: false, error: "Cart empty" }, { status: 400 })
-    }
+    const message =
+      `📦 НОВАЯ ЗАЯВКА\n\n` +
+      body.items
+        .map((i: any, idx: number) => `${idx + 1}. ${i.title} × ${i.qty}`)
+        .join("\n") +
+      `\n\n📊 Всего: ${body.totalItems}\n\n💬 Комментарий:\n${body.comment || "—"}`
 
-    const message = items
-      .map(
-        (item: CartItem, i: number) =>
-          `${i + 1}. ${item.title} × ${item.qty}`
-      )
-      .join("\n")
+    console.log("[ORDER MESSAGE]", message)
 
-    const fullMessage = `📦 НОВАЯ ЗАЯВКА\n\n${message}\n\n💬 Комментарий:\n${comment || "—"}`
+    await sendToOperator(chatId, message)
 
-    console.log("[ORDER MESSAGE]", fullMessage)
-
-    await sendToOperator(fullMessage)
-
-    // ❗ ВАЖНО: фронт ждёт ok=true
-    return Response.json({
-      ok: true,
-    })
-  } catch (error: any) {
-    console.error("[ORDER ERROR]", error)
+    return Response.json({ success: true })
+  } catch (e: any) {
+    console.error("[ORDER ERROR]", e)
 
     return Response.json(
-      {
-        ok: false,
-        error: error.message || "Internal error",
-      },
+      { success: false, error: e.message },
       { status: 500 }
     )
   }
