@@ -5,7 +5,6 @@ import Link from "next/link"
 
 import ProductCard from "@/components/ProductCard"
 import CartBar from "@/components/CartBar"
-import PromoBanner from "@/components/PromoBanner"
 
 type Product = {
   id: string
@@ -138,119 +137,115 @@ export default function CatalogPage() {
 
           </div>
 
-        </div>
-
-        {/* PROMO */}
-        <PromoBanner />
-
-        {/* CATEGORY TABS */}
-        <div
-          className="
-            flex
-            gap-2
-            overflow-x-auto
-            px-3
-            py-3
-            bg-white
-            border-y
-            border-[#E2E8F0]
-            mt-3
-          "
-        >
-
-          {categories.map((c) => (
-            <button
-              key={c}
-              onClick={() => {
-                setCategory(c)
-                setSubcategory("Все")
-              }}
-              className={`
-                px-4
-                py-2
-                rounded-full
-                text-sm
-                whitespace-nowrap
-                transition-all
-                border
-
-                ${
-                  category === c
-                    ? "bg-[#0B1F3A] text-white border-[#0B1F3A]"
-                    : "bg-white text-[#0B1F3A] border-[#E2E8F0]"
-                }
-              `}
-            >
-              {c}
-            </button>
-          ))}
-
-        </div>
-
-        {/* SEARCH */}
-        <div className="bg-white px-3 py-3 border-b border-[#E2E8F0]">
-
-          <input
-            type="text"
-            placeholder="Поиск товара или бренда"
-            value={search}
-            onChange={(e) =>
-              setSearch(e.target.value)
-            }
+          {/* CATEGORY TABS */}
+          <div
             className="
-              w-full
-              h-11
-              rounded-2xl
-              bg-[#F5F7FA]
-              px-4
-              text-sm
-              outline-none
-              border
-              border-transparent
-              focus:border-[#0B1F3A]
+              flex
+              gap-2
+              overflow-x-auto
+              px-3
+              py-3
+              bg-white
+              border-b
+              border-[#E2E8F0]
             "
-          />
+          >
 
-        </div>
+            {categories.map((c) => (
+              <button
+                key={c}
+                onClick={() => {
+                  setCategory(c)
+                  setSubcategory("Все")
+                }}
+                className={`
+                  px-4
+                  py-2
+                  rounded-full
+                  text-sm
+                  whitespace-nowrap
+                  transition-all
+                  border
 
-        {/* SUBCATEGORY */}
-        <div
-          className="
-            flex
-            gap-2
-            overflow-x-auto
-            px-3
-            py-3
-            bg-white
-            border-b
-            border-[#E2E8F0]
-          "
-        >
+                  ${
+                    category === c
+                      ? "bg-[#0B1F3A] text-white border-[#0B1F3A]"
+                      : "bg-white text-[#0B1F3A] border-[#E2E8F0]"
+                  }
+                `}
+              >
+                {c}
+              </button>
+            ))}
 
-          {subcategories.map((s) => (
-            <button
-              key={s}
-              onClick={() =>
-                setSubcategory(s || "Все")
+          </div>
+
+          {/* SEARCH */}
+          <div className="bg-white px-3 py-3 border-b border-[#E2E8F0]">
+
+            <input
+              type="text"
+              placeholder="Поиск товара или бренда"
+              value={search}
+              onChange={(e) =>
+                setSearch(e.target.value)
               }
-              className={`
-                px-3
-                py-2
-                rounded-full
-                text-xs
-                whitespace-nowrap
-                transition-all
+              className="
+                w-full
+                h-11
+                rounded-2xl
+                bg-[#F5F7FA]
+                px-4
+                text-sm
+                outline-none
+                border
+                border-transparent
+                focus:border-[#0B1F3A]
+              "
+            />
 
-                ${
-                  subcategory === s
-                    ? "bg-[#2C5D7A] text-white"
-                    : "bg-[#F5F7FA] text-[#0B1F3A]"
+          </div>
+
+          {/* SUBCATEGORY */}
+          <div
+            className="
+              flex
+              gap-2
+              overflow-x-auto
+              px-3
+              py-3
+              bg-white
+              border-b
+              border-[#E2E8F0]
+            "
+          >
+
+            {subcategories.map((s) => (
+              <button
+                key={s}
+                onClick={() =>
+                  setSubcategory(s || "Все")
                 }
-              `}
-            >
-              {s}
-            </button>
-          ))}
+                className={`
+                  px-3
+                  py-2
+                  rounded-full
+                  text-xs
+                  whitespace-nowrap
+                  transition-all
+
+                  ${
+                    subcategory === s
+                      ? "bg-[#2C5D7A] text-white"
+                      : "bg-[#F5F7FA] text-[#0B1F3A]"
+                  }
+                `}
+              >
+                {s}
+              </button>
+            ))}
+
+          </div>
 
         </div>
 
