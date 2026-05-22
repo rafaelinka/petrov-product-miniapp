@@ -15,6 +15,14 @@ type Product = {
   weight?: string
   country?: string
   image?: string
+
+  description?: string
+  composition?: string
+  storage?: string
+  shelfLife?: string
+  packageType?: string
+  manufacturer?: string
+  websiteUrl?: string
 }
 
 export default function CatalogPage() {
@@ -22,7 +30,8 @@ export default function CatalogPage() {
 
   const [category, setCategory] = useState("Все")
 
-  const [subcategory, setSubcategory] = useState("Все")
+  const [subcategory, setSubcategory] =
+    useState("Все")
 
   const [search, setSearch] = useState("")
 
@@ -261,6 +270,14 @@ export default function CatalogPage() {
               weight={product.weight}
               country={product.country}
               image={product.image}
+
+              description={product.description}
+              composition={product.composition}
+              storage={product.storage}
+              shelfLife={product.shelfLife}
+              packageType={product.packageType}
+              manufacturer={product.manufacturer}
+              websiteUrl={product.websiteUrl}
             />
           ))}
 

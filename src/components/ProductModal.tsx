@@ -1,106 +1,356 @@
 "use client"
 
 import Image from "next/image"
+import { useCartStore } from "@/store/cartStore"
+import { getCountryFlag } from "@/lib/countryFlag"
 
 type Props = {
   open: boolean
   onClose: () => void
 
-  product: {
-    id: string
-    title: string
-    brand: string
-    weight?: string
-    country?: string
-    image?: string
-    description?: string
-  } | null
+  id: string
+  title: string
+  brand: string
+  weight?: string
+  country?: string
+  image?: string
+
+  description?: string
+  composition?: string
+  storage?: string
+  shelfLife?: string
+  packageType?: string
+  manufacturer?: string
+  websiteUrl?: string
 }
 
-const countryFlag = (country?: string) => {
-  switch (country) {
-    case "Россия":
-      return "🇷🇺"
-    case "Беларусь":
-      return "🇧🇾"
-    case "Аргентина":
-      return "🇦🇷"
-    default:
-      return "🌍"
-  }
-}
+export default function ProductModal({
+  open,
+  onClose,
 
-export default function ProductModal({ open, onClose, product }: Props) {
-  if (!open || !product) return null
+  id,
+  title,
+  brand,
+  weight,
+  country,
+  image,
+
+  description,
+  composition,
+  storage,
+  shelfLife,
+  packageType,
+  manufacturer,
+  websiteUrl,
+}: Props) {
+  const {
+    addItem,
+    increaseQty,
+    decreaseQty,
+    items,
+  } = useCartStore()
+
+  const cartItem = items.find((i) => i.id === id)
+
+  if (!open) return null
 
   return (
-    <div className="fixed inset-0 z-[100] bg-black/50 flex items-end justify-center">
-      <div className="w-full max-w-[420px] bg-white rounded-t-3xl p-4 max-h-[90vh] overflow-y-auto">
+    <div
+      className="
+        fixed
+        inset-0
+        z-[200]
+        bg-black/40
+        flex
+        items-end
+        justify-center
+      "
+    >
 
-        {/* CLOSE */}
-        <div className="flex justify-between items-center mb-3">
-          <div className="text-sm font-semibold text-[#0B1F3A]">
-            Детали товара
-          </div>
+      <div
+        className="
+          w-full
+          max-w-[420px]
+          bg-white
+          rounded-t-3xl
+          overflow-hidden
+          max-h-[92vh]
+          overflow-y-auto
+        "
+      >
 
+        {/* IMAGE */}
+        <div className="relative">
+
+          {image ? (
+            <Image
+              src={`/products/${image}`}
+              alt={title}
+              width={800}
+              height={600}
+              className="
+                w-full
+                h-[280px]
+                object-cover
+              "
+            />
+          ) : (
+            <div className="h-[280px] bg-[#F5F7FA]" />
+          )}
+
+          {/* CLOSE */}
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-full bg-[#F5F7FA]"
+            className="
+              absolute
+              top-4
+              right-4
+              w-10
+              h-10
+              rounded-full
+              bg-white/90
+              backdrop-blur
+              text-[#0B1F3A]
+              text-lg
+              shadow
+            "
           >
             ✕
           </button>
+
         </div>
 
-        {/* IMAGE */}
-        <div className="bg-[#F5F7FA] rounded-2xl overflow-hidden">
-          {product.image ? (
-            <Image
-              src={`/products/${product.image}`}
-              alt={product.title}
-              width={500}
-              height={400}
-              className="w-full h-52 object-cover"
-            />
-          ) : (
-            <div className="h-52 flex items-center justify-center text-gray-400">
-              Нет фото
+        {/* CONTENT */}
+        <div className="p-4">
+
+          {/* TITLE */}
+          <div>
+
+            <h2 className="text-xl font-semibold text-[#0B1F3A]">
+              {title}
+            </h2>
+
+            <div className="text-sm text-gray-500 mt-1">
+              {brand}
+            </div>
+
+          </div>
+
+          {/* INFO */}
+          <div className="mt-4 flex flex-wrap gap-2">
+
+            {country && (
+              <div
+                className="
+                  px-3
+                  py-1.5
+                  rounded-full
+                  bg-[#F5F7FA]
+                  text-xs
+                  text-[#0B1F3A]
+                "
+              >
+                {getCountryFlag(country)} {country}
+              </div>
+            )}
+
+            {weight && (
+              <div
+                className="
+                  px-3
+                  py-1.5
+                  rounded-full
+                  bg-[#F5F7FA]
+                  text-xs
+                  text-[#0B1F3A]
+                "
+              >
+                {weight}
+              </div>
+            )}
+
+            {shelfLife && (
+              <div
+                className="
+                  px-3
+                  py-1.5
+                  rounded-full
+                  bg-[#F5F7FA]
+                  text-xs
+                  text-[#0B1F3A]
+                "
+              >
+                Срок: {shelfLife}
+              </div>
+            )}
+
+          </div>
+
+          {/* DESCRIPTION */}
+          {description && (
+            <div className="mt-5">
+
+              <div className="text-sm font-semibold text-[#0B1F3A]">
+                Описание
+              </div>
+
+              <div className="text-sm text-gray-600 mt-2 leading-relaxed">
+                {description}
+              </div>
+
             </div>
           )}
-        </div>
 
-        {/* INFO */}
-        <div className="mt-4 space-y-2">
-          <div className="text-lg font-semibold text-[#1A1A1A]">
-            {product.title}
-          </div>
+          {/* COMPOSITION */}
+          {composition && (
+            <div className="mt-5">
 
-          <div className="text-sm text-gray-500">
-            {product.brand}
-          </div>
+              <div className="text-sm font-semibold text-[#0B1F3A]">
+                Состав
+              </div>
 
-          <div className="flex gap-4 text-sm text-gray-600 mt-2">
-            <div>{product.weight}</div>
+              <div className="text-sm text-gray-600 mt-2 leading-relaxed">
+                {composition}
+              </div>
 
-            <div className="flex items-center gap-1">
-              <span>{countryFlag(product.country)}</span>
-              <span>{product.country}</span>
             </div>
+          )}
+
+          {/* STORAGE */}
+          {(storage || packageType || manufacturer) && (
+            <div className="mt-5 space-y-2">
+
+              {storage && (
+                <div className="text-sm text-gray-600">
+                  <span className="font-medium text-[#0B1F3A]">
+                    Хранение:
+                  </span>{" "}
+                  {storage}
+                </div>
+              )}
+
+              {packageType && (
+                <div className="text-sm text-gray-600">
+                  <span className="font-medium text-[#0B1F3A]">
+                    Упаковка:
+                  </span>{" "}
+                  {packageType}
+                </div>
+              )}
+
+              {manufacturer && (
+                <div className="text-sm text-gray-600">
+                  <span className="font-medium text-[#0B1F3A]">
+                    Производитель:
+                  </span>{" "}
+                  {manufacturer}
+                </div>
+              )}
+
+            </div>
+          )}
+
+          {/* SITE BUTTON */}
+          {websiteUrl && (
+            <a
+              href={websiteUrl}
+              target="_blank"
+              className="
+                mt-5
+                h-12
+                rounded-2xl
+                border
+                border-[#E2E8F0]
+                flex
+                items-center
+                justify-center
+                text-sm
+                font-medium
+                text-[#0B1F3A]
+              "
+            >
+              Подробнее на сайте
+            </a>
+          )}
+
+          {/* ACTION */}
+          <div className="mt-5">
+
+            {!cartItem ? (
+              <button
+                onClick={() =>
+                  addItem({
+                    id,
+                    title,
+                    qty: 1,
+                  })
+                }
+                className="
+                  w-full
+                  bg-[#D64545]
+                  text-white
+                  py-3
+                  rounded-2xl
+                  text-sm
+                  font-semibold
+                "
+              >
+                Добавить в заявку
+              </button>
+            ) : (
+              <div
+                className="
+                  h-[52px]
+                  rounded-2xl
+                  border
+                  border-[#E2E8F0]
+                  flex
+                  items-center
+                  justify-between
+                  px-3
+                "
+              >
+
+                <button
+                  onClick={() => decreaseQty(id)}
+                  className="
+                    w-10
+                    h-10
+                    rounded-xl
+                    bg-[#F5F7FA]
+                    text-lg
+                  "
+                >
+                  −
+                </button>
+
+                <div className="font-semibold text-[#0B1F3A]">
+                  {cartItem.qty}
+                </div>
+
+                <button
+                  onClick={() => increaseQty(id)}
+                  className="
+                    w-10
+                    h-10
+                    rounded-xl
+                    bg-[#0B1F3A]
+                    text-white
+                    text-lg
+                  "
+                >
+                  +
+                </button>
+
+              </div>
+            )}
+
           </div>
 
-          {/* DESCRIPTION (заранее заложили для будущего) */}
-          <div className="mt-3 text-sm text-gray-700">
-            {product.description || "Описание появится позже"}
-          </div>
         </div>
 
-        {/* ACTION */}
-        <button
-          onClick={onClose}
-          className="w-full mt-5 bg-[#0B1F3A] text-white py-3 rounded-2xl"
-        >
-          Закрыть
-        </button>
       </div>
+
     </div>
   )
 }
