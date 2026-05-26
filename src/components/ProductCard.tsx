@@ -23,6 +23,8 @@ type Props = {
   packageType?: string
   manufacturer?: string
   websiteUrl?: string
+
+  badge?: string
 }
 
 export default function ProductCard({
@@ -40,6 +42,8 @@ export default function ProductCard({
   packageType,
   manufacturer,
   websiteUrl,
+
+  badge,
 }: Props) {
   const {
     items,
@@ -68,7 +72,37 @@ export default function ProductCard({
       >
 
         {/* IMAGE */}
-        <div className="bg-[#F5F7FA]">
+        <div className="bg-[#F5F7FA] relative">
+
+          {/* BADGE */}
+          {badge && (
+            <div className="absolute top-2 left-2 z-10">
+
+              <div
+                className={`
+                  px-2
+                  py-1
+                  rounded-full
+                  text-[10px]
+                  font-semibold
+                  text-white
+
+                  ${
+                    badge === "PROMO"
+                      ? "bg-[#D64545]"
+                      : badge === "HIT"
+                      ? "bg-[#F59E0B]"
+                      : "bg-[#2C5D7A]"
+                  }
+                `}
+              >
+                {badge === "PROMO" && "🔥 АКЦИЯ"}
+                {badge === "HIT" && "⭐ ХИТ"}
+                {badge === "NEW" && "🆕 NEW"}
+              </div>
+
+            </div>
+          )}
 
           {image ? (
             <Image
@@ -232,6 +266,8 @@ export default function ProductCard({
         packageType={packageType}
         manufacturer={manufacturer}
         websiteUrl={websiteUrl}
+
+        badge={badge}
       />
     </>
   )

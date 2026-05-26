@@ -23,6 +23,8 @@ type Product = {
   packageType?: string
   manufacturer?: string
   websiteUrl?: string
+
+  badge?: string
 }
 
 export default function CatalogPage() {
@@ -278,6 +280,8 @@ export default function CatalogPage() {
               packageType={product.packageType}
               manufacturer={product.manufacturer}
               websiteUrl={product.websiteUrl}
+
+              badge={product.badge}
             />
           ))}
 
