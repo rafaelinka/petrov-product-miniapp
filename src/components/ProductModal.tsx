@@ -1,7 +1,6 @@
 "use client"
 
 import Image from "next/image"
-import { useCartStore } from "@/store/cartStore"
 import { getCountryFlag } from "@/lib/countryFlag"
 
 type Props = {
@@ -22,13 +21,14 @@ type Props = {
   packageType?: string
   manufacturer?: string
   websiteUrl?: string
+
+  badge?: string
 }
 
 export default function ProductModal({
   open,
   onClose,
 
-  id,
   title,
   brand,
   weight,
@@ -39,19 +39,12 @@ export default function ProductModal({
   composition,
   storage,
   shelfLife,
-  packageType,
+ packageType,
   manufacturer,
   websiteUrl,
+
+  badge,
 }: Props) {
-  const {
-    addItem,
-    increaseQty,
-    decreaseQty,
-    items,
-  } = useCartStore()
-
-  const cartItem = items.find((i) => i.id === id)
-
   if (!open) return null
 
   return (
@@ -81,6 +74,37 @@ export default function ProductModal({
 
         {/* IMAGE */}
         <div className="relative">
+
+          {/* BADGE */}
+          {badge && (
+            <div className="absolute top-4 left-4 z-10">
+
+              <div
+                className={`
+                  px-3
+                  py-1.5
+                  rounded-full
+                  text-xs
+                  font-semibold
+                  text-white
+                  shadow
+
+                  ${
+                    badge === "PROMO"
+                      ? "bg-[#D64545]"
+                      : badge === "HIT"
+                      ? "bg-[#F59E0B]"
+                      : "bg-[#2C5D7A]"
+                  }
+                `}
+              >
+                {badge === "PROMO" && "🔥 Акция"}
+                {badge === "HIT" && "⭐ Хит продаж"}
+                {badge === "NEW" && "🆕 Новинка"}
+              </div>
+
+            </div>
+          )}
 
           {image ? (
             <Image
@@ -216,7 +240,7 @@ export default function ProductModal({
             </div>
           )}
 
-          {/* STORAGE */}
+          {/* EXTRA INFO */}
           {(storage || packageType || manufacturer) && (
             <div className="mt-5 space-y-2">
 
@@ -250,7 +274,7 @@ export default function ProductModal({
             </div>
           )}
 
-          {/* SITE BUTTON */}
+          {/* WEBSITE */}
           {websiteUrl && (
             <a
               href={websiteUrl}
@@ -272,80 +296,6 @@ export default function ProductModal({
               Подробнее на сайте
             </a>
           )}
-
-          {/* ACTION */}
-          <div className="mt-5">
-
-            {!cartItem ? (
-              <button
-                onClick={() =>
-                  addItem({
-                    id,
-                    title,
-                    qty: 1,
-                  })
-                }
-                className="
-                  w-full
-                  bg-[#D64545]
-                  text-white
-                  py-3
-                  rounded-2xl
-                  text-sm
-                  font-semibold
-                "
-              >
-                Добавить в заявку
-              </button>
-            ) : (
-              <div
-                className="
-                  h-[52px]
-                  rounded-2xl
-                  border
-                  border-[#E2E8F0]
-                  flex
-                  items-center
-                  justify-between
-                  px-3
-                "
-              >
-
-                <button
-                  onClick={() => decreaseQty(id)}
-                  className="
-                    w-10
-                    h-10
-                    rounded-xl
-                    bg-[#F5F7FA]
-                    text-lg
-                  "
-                >
-                  −
-                </button>
-
-                <div className="font-semibold text-[#0B1F3A]">
-                  {cartItem.qty}
-                </div>
-
-                <button
-                  onClick={() => increaseQty(id)}
-                  className="
-                    w-10
-                    h-10
-                    rounded-xl
-                    bg-[#0B1F3A]
-                    text-white
-                    text-lg
-                  "
-                >
-                  +
-                </button>
-
-              </div>
-            )}
-
-          </div>
 
         </div>
 
