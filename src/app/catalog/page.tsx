@@ -48,7 +48,11 @@ export default function CatalogPage() {
   // CATEGORIES
   const categories = useMemo(() => {
     const unique = [
-      ...new Set(products.map((p) => p.category)),
+      ...new Set(
+        products
+          .map((p) => p.category)
+          .filter(Boolean)
+      ),
     ]
 
     return ["Все", ...unique]
@@ -87,10 +91,13 @@ export default function CatalogPage() {
           : p.subcategory === subcategory
 
       const searchMatch =
-        p.title
+        (p.title || "")
           .toLowerCase()
           .includes(search.toLowerCase()) ||
-        p.brand
+        (p.brand || "")
+          .toLowerCase()
+          .includes(search.toLowerCase()) ||
+        (p.manufacturer || "")
           .toLowerCase()
           .includes(search.toLowerCase())
 
@@ -196,7 +203,7 @@ export default function CatalogPage() {
 
             <input
               type="text"
-              placeholder="Поиск товара или бренда"
+              placeholder="Поиск товара, бренда или производителя"
               value={search}
               onChange={(e) =>
                 setSearch(e.target.value)
