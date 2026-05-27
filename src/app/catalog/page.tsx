@@ -30,7 +30,11 @@ type Product = {
 export default function CatalogPage() {
   const [products, setProducts] = useState<Product[]>([])
 
-  const [category, setCategory] = useState("Все")
+  const [loading, setLoading] =
+    useState(true)
+
+  const [category, setCategory] =
+    useState("Все")
 
   const [subcategory, setSubcategory] =
     useState("Все")
@@ -40,13 +44,36 @@ export default function CatalogPage() {
   const [sort, setSort] =
     useState("POPULAR")
 
+  const [sortOpen, setSortOpen] =
+    useState(false)
+
   useEffect(() => {
     fetch("/api/products")
       .then((res) => res.json())
       .then((data) => {
         setProducts(data)
       })
+      .finally(() => {
+        setLoading(false)
+      })
   }, [])
+
+  // SORT LABEL
+  const sortLabel = useMemo(() => {
+    if (sort === "POPULAR")
+      return "Популярные"
+
+    if (sort === "NEW")
+      return "Сначала новинки"
+
+    if (sort === "PROMO")
+      return "Сначала акции"
+
+    if (sort === "AZ")
+      return "По алфавиту"
+
+    return "Сортировка"
+  }, [sort])
 
   // CATEGORIES
   const categories = useMemo(() => {
@@ -122,8 +149,12 @@ export default function CatalogPage() {
 
     if (sort === "PROMO") {
       filtered = filtered.sort((a, b) => {
-        if (a.badge === "PROMO") return -1
-        if (b.badge === "PROMO") return 1
+        if (a.badge === "PROMO")
+          return -1
+
+        if (b.badge === "PROMO")
+          return 1
+
         return 0
       })
     }
@@ -255,95 +286,125 @@ export default function CatalogPage() {
 
           </div>
 
-          {/* SORT */}
-          <div
-            className="
-              flex
-              gap-2
-              overflow-x-auto
-              px-3
-              py-3
-              bg-white
-              border-b
-              border-[#E2E8F0]
-            "
-          >
+          {/* SORT DROPDOWN */}
+          <div className="bg-white border-b border-[#E2E8F0] px-3 py-3 relative">
 
             <button
-              onClick={() => setSort("POPULAR")}
-              className={`
-                px-3
-                py-2
-                rounded-full
-                text-xs
-                whitespace-nowrap
-
-                ${
-                  sort === "POPULAR"
-                    ? "bg-[#0B1F3A] text-white"
-                    : "bg-[#F5F7FA] text-[#0B1F3A]"
-                }
-              `}
+              onClick={() =>
+                setSortOpen(!sortOpen)
+              }
+              className="
+                h-10
+                px-4
+                rounded-2xl
+                bg-[#F5F7FA]
+                text-[#0B1F3A]
+                text-sm
+                font-medium
+                flex
+                items-center
+                gap-2
+              "
             >
-              Популярные
+              ⇅ {sortLabel}
+              <span className="text-xs">
+                ▼
+              </span>
             </button>
 
-            <button
-              onClick={() => setSort("NEW")}
-              className={`
-                px-3
-                py-2
-                rounded-full
-                text-xs
-                whitespace-nowrap
+            {sortOpen && (
+              <div
+                className="
+                  absolute
+                  top-[62px]
+                  left-3
+                  right-3
+                  bg-white
+                  border
+                  border-[#E2E8F0]
+                  rounded-2xl
+                  shadow-lg
+                  overflow-hidden
+                  z-50
+                "
+              >
 
-                ${
-                  sort === "NEW"
-                    ? "bg-[#0B1F3A] text-white"
-                    : "bg-[#F5F7FA] text-[#0B1F3A]"
-                }
-              `}
-            >
-              🆕 Новинки
-            </button>
+                <button
+                  onClick={() => {
+                    setSort("POPULAR")
+                    setSortOpen(false)
+                  }}
+                  className="
+                    w-full
+                    px-4
+                    py-3
+                    text-left
+                    text-sm
+                    hover:bg-[#F5F7FA]
+                    border-b
+                    border-[#F1F5F9]
+                  "
+                >
+                  ✓ Популярные
+                </button>
 
-            <button
-              onClick={() => setSort("PROMO")}
-              className={`
-                px-3
-                py-2
-                rounded-full
-                text-xs
-                whitespace-nowrap
+                <button
+                  onClick={() => {
+                    setSort("NEW")
+                    setSortOpen(false)
+                  }}
+                  className="
+                    w-full
+                    px-4
+                    py-3
+                    text-left
+                    text-sm
+                    hover:bg-[#F5F7FA]
+                    border-b
+                    border-[#F1F5F9]
+                  "
+                >
+                  🆕 Сначала новинки
+                </button>
 
-                ${
-                  sort === "PROMO"
-                    ? "bg-[#0B1F3A] text-white"
-                    : "bg-[#F5F7FA] text-[#0B1F3A]"
-                }
-              `}
-            >
-              🔥 Акции
-            </button>
+                <button
+                  onClick={() => {
+                    setSort("PROMO")
+                    setSortOpen(false)
+                  }}
+                  className="
+                    w-full
+                    px-4
+                    py-3
+                    text-left
+                    text-sm
+                    hover:bg-[#F5F7FA]
+                    border-b
+                    border-[#F1F5F9]
+                  "
+                >
+                  🔥 Сначала акции
+                </button>
 
-            <button
-              onClick={() => setSort("AZ")}
-              className={`
-                px-3
-                py-2
-                rounded-full
-                text-xs
-                whitespace-nowrap
+                <button
+                  onClick={() => {
+                    setSort("AZ")
+                    setSortOpen(false)
+                  }}
+                  className="
+                    w-full
+                    px-4
+                    py-3
+                    text-left
+                    text-sm
+                    hover:bg-[#F5F7FA]
+                  "
+                >
+                  🔤 По алфавиту
+                </button>
 
-                ${
-                  sort === "AZ"
-                    ? "bg-[#0B1F3A] text-white"
-                    : "bg-[#F5F7FA] text-[#0B1F3A]"
-                }
-              `}
-            >
-              А-Я
-            </button>
+              </div>
+            )}
 
           </div>
 
@@ -390,51 +451,91 @@ export default function CatalogPage() {
 
         </div>
 
-        {/* EMPTY */}
-        {filteredProducts.length === 0 && (
-          <div className="px-6 py-16 text-center">
+        {/* LOADING */}
+        {loading && (
+          <div className="grid grid-cols-2 gap-3 p-3 pb-28">
 
-            <div className="text-5xl">
-              😕
-            </div>
+            {Array.from({ length: 6 }).map(
+              (_, i) => (
+                <div
+                  key={i}
+                  className="
+                    bg-white
+                    rounded-2xl
+                    overflow-hidden
+                    border
+                    border-[#E2E8F0]
+                    animate-pulse
+                  "
+                >
 
-            <div className="mt-4 text-[#0B1F3A] font-semibold">
-              Ничего не найдено
-            </div>
+                  <div className="h-40 bg-[#E2E8F0]" />
 
-            <div className="mt-2 text-sm text-gray-500">
-              Попробуйте изменить запрос
-            </div>
+                  <div className="p-3">
+
+                    <div className="h-4 bg-[#E2E8F0] rounded w-full" />
+
+                    <div className="h-4 bg-[#E2E8F0] rounded w-2/3 mt-2" />
+
+                    <div className="h-10 bg-[#E2E8F0] rounded-xl mt-4" />
+
+                  </div>
+
+                </div>
+              )
+            )}
 
           </div>
         )}
 
+        {/* EMPTY */}
+        {!loading &&
+          filteredProducts.length === 0 && (
+            <div className="px-6 py-16 text-center">
+
+              <div className="text-5xl">
+                😕
+              </div>
+
+              <div className="mt-4 text-[#0B1F3A] font-semibold">
+                Ничего не найдено
+              </div>
+
+              <div className="mt-2 text-sm text-gray-500">
+                Попробуйте изменить запрос
+              </div>
+
+            </div>
+          )}
+
         {/* GRID */}
-        <div className="grid grid-cols-2 gap-3 p-3 pb-28">
+        {!loading && (
+          <div className="grid grid-cols-2 gap-3 p-3 pb-28">
 
-          {filteredProducts.map((product) => (
-            <ProductCard
-              key={product.id}
-              id={product.id}
-              title={product.title}
-              brand={product.brand}
-              weight={product.weight}
-              country={product.country}
-              image={product.image}
+            {filteredProducts.map((product) => (
+              <ProductCard
+                key={product.id}
+                id={product.id}
+                title={product.title}
+                brand={product.brand}
+                weight={product.weight}
+                country={product.country}
+                image={product.image}
 
-              description={product.description}
-              composition={product.composition}
-              storage={product.storage}
-              shelfLife={product.shelfLife}
-              packageType={product.packageType}
-              manufacturer={product.manufacturer}
-              websiteUrl={product.websiteUrl}
+                description={product.description}
+                composition={product.composition}
+                storage={product.storage}
+                shelfLife={product.shelfLife}
+                packageType={product.packageType}
+                manufacturer={product.manufacturer}
+                websiteUrl={product.websiteUrl}
 
-              badge={product.badge}
-            />
-          ))}
+                badge={product.badge}
+              />
+            ))}
 
-        </div>
+          </div>
+        )}
 
         <CartBar />
 
