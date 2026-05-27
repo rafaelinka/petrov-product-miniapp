@@ -8,6 +8,8 @@ import { getCountryFlag } from "@/lib/countryFlag"
 
 import ProductModal from "@/components/ProductModal"
 
+import { useFavoritesStore } from "@/store/favoritesStore"
+
 type Props = {
   id: string
   title: string
@@ -52,6 +54,13 @@ export default function ProductCard({
     decreaseQty,
   } = useCartStore()
 
+  const {
+    toggleFavorite,
+    isFavorite,
+  } = useFavoritesStore()
+
+  const favorite = isFavorite(id)
+
   const [open, setOpen] = useState(false)
 
   const cartItem = items.find((i) => i.id === id)
@@ -74,33 +83,70 @@ export default function ProductCard({
         {/* IMAGE */}
         <div className="bg-[#F5F7FA] relative">
 
+          {/* FAVORITE */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation()
+              toggleFavorite(id)
+            }}
+            className="
+              absolute
+              top-2
+              right-2
+              z-10
+              w-9
+              h-9
+              rounded-full
+              bg-white/90
+              backdrop-blur
+              shadow-sm
+              flex
+              items-center
+              justify-center
+              text-lg
+            "
+          >
+            {favorite ? "♥" : "♡"}
+          </button>
+
           {/* BADGE */}
-          {badge && (
-            <div className="absolute top-2 left-2 z-10">
+          {badge === "PROMO" && (
+            <div
+              className="
+                absolute
+                top-2
+                left-2
+                z-10
+                bg-[#D64545]
+                text-white
+                text-[10px]
+                font-semibold
+                px-2
+                py-1
+                rounded-full
+              "
+            >
+              АКЦИЯ
+            </div>
+          )}
 
-              <div
-                className={`
-                  px-2
-                  py-1
-                  rounded-full
-                  text-[10px]
-                  font-semibold
-                  text-white
-
-                  ${
-                    badge === "PROMO"
-                      ? "bg-[#D64545]"
-                      : badge === "HIT"
-                      ? "bg-[#F59E0B]"
-                      : "bg-[#2C5D7A]"
-                  }
-                `}
-              >
-                {badge === "PROMO" && "🔥 АКЦИЯ"}
-                {badge === "HIT" && "⭐ ХИТ"}
-                {badge === "NEW" && "🆕 NEW"}
-              </div>
-
+          {badge === "NEW" && (
+            <div
+              className="
+                absolute
+                top-2
+                left-2
+                z-10
+                bg-[#2C5D7A]
+                text-white
+                text-[10px]
+                font-semibold
+                px-2
+                py-1
+                rounded-full
+              "
+            >
+              NEW
             </div>
           )}
 

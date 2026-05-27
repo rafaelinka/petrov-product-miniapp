@@ -6,6 +6,8 @@ import Link from "next/link"
 import ProductCard from "@/components/ProductCard"
 import CartBar from "@/components/CartBar"
 
+import { useFavoritesStore } from "@/store/favoritesStore"
+
 type Product = {
   id: string
   title: string
@@ -46,6 +48,12 @@ export default function CatalogPage() {
 
   const [sortOpen, setSortOpen] =
     useState(false)
+
+  const [favoritesOnly, setFavoritesOnly] =
+    useState(false)
+
+  const { favorites } =
+    useFavoritesStore()
 
   useEffect(() => {
     fetch("/api/products")
@@ -131,10 +139,16 @@ export default function CatalogPage() {
           .toLowerCase()
           .includes(search.toLowerCase())
 
+      const favoriteMatch =
+        favoritesOnly
+          ? favorites.includes(p.id)
+          : true
+
       return (
         categoryMatch &&
         subcategoryMatch &&
-        searchMatch
+        searchMatch &&
+        favoriteMatch
       )
     })
 
@@ -174,6 +188,8 @@ export default function CatalogPage() {
     subcategory,
     search,
     sort,
+    favoritesOnly,
+    favorites,
   ])
 
   return (
@@ -286,31 +302,63 @@ export default function CatalogPage() {
 
           </div>
 
-          {/* SORT DROPDOWN */}
+          {/* SORT */}
           <div className="bg-white border-b border-[#E2E8F0] px-3 py-3 relative">
 
-            <button
-              onClick={() =>
-                setSortOpen(!sortOpen)
-              }
-              className="
-                h-10
-                px-4
-                rounded-2xl
-                bg-[#F5F7FA]
-                text-[#0B1F3A]
-                text-sm
-                font-medium
-                flex
-                items-center
-                gap-2
-              "
-            >
-              ⇅ {sortLabel}
-              <span className="text-xs">
-                ▼
-              </span>
-            </button>
+            <div className="flex items-center gap-2">
+
+              <button
+                onClick={() =>
+                  setSortOpen(!sortOpen)
+                }
+                className="
+                  h-10
+                  px-4
+                  rounded-2xl
+                  bg-[#F5F7FA]
+                  text-[#0B1F3A]
+                  text-sm
+                  font-medium
+                  flex
+                  items-center
+                  gap-2
+                "
+              >
+                ⇅ {sortLabel}
+
+                <span className="text-xs">
+                  ▼
+                </span>
+              </button>
+
+              {/* FAVORITES */}
+              <button
+                onClick={() =>
+                  setFavoritesOnly(
+                    !favoritesOnly
+                  )
+                }
+                className={`
+                  h-10
+                  px-4
+                  rounded-2xl
+                  text-sm
+                  font-medium
+                  transition-all
+
+                  ${
+                    favoritesOnly
+                      ? "bg-[#D64545] text-white"
+                      : "bg-[#F5F7FA] text-[#0B1F3A]"
+                  }
+                `}
+              >
+                {favoritesOnly
+                  ? "♥ Избранное"
+                  : "♡ Избранное"}
+              </button>
+
+            </div>
 
             {sortOpen && (
               <div
@@ -451,91 +499,32 @@ export default function CatalogPage() {
 
         </div>
 
-        {/* LOADING */}
-        {loading && (
-          <div className="grid grid-cols-2 gap-3 p-3 pb-28">
-
-            {Array.from({ length: 6 }).map(
-              (_, i) => (
-                <div
-                  key={i}
-                  className="
-                    bg-white
-                    rounded-2xl
-                    overflow-hidden
-                    border
-                    border-[#E2E8F0]
-                    animate-pulse
-                  "
-                >
-
-                  <div className="h-40 bg-[#E2E8F0]" />
-
-                  <div className="p-3">
-
-                    <div className="h-4 bg-[#E2E8F0] rounded w-full" />
-
-                    <div className="h-4 bg-[#E2E8F0] rounded w-2/3 mt-2" />
-
-                    <div className="h-10 bg-[#E2E8F0] rounded-xl mt-4" />
-
-                  </div>
-
-                </div>
-              )
-            )}
-
-          </div>
-        )}
-
-        {/* EMPTY */}
-        {!loading &&
-          filteredProducts.length === 0 && (
-            <div className="px-6 py-16 text-center">
-
-              <div className="text-5xl">
-                😕
-              </div>
-
-              <div className="mt-4 text-[#0B1F3A] font-semibold">
-                Ничего не найдено
-              </div>
-
-              <div className="mt-2 text-sm text-gray-500">
-                Попробуйте изменить запрос
-              </div>
-
-            </div>
-          )}
-
         {/* GRID */}
-        {!loading && (
-          <div className="grid grid-cols-2 gap-3 p-3 pb-28">
+        <div className="grid grid-cols-2 gap-3 p-3 pb-28">
 
-            {filteredProducts.map((product) => (
-              <ProductCard
-                key={product.id}
-                id={product.id}
-                title={product.title}
-                brand={product.brand}
-                weight={product.weight}
-                country={product.country}
-                image={product.image}
+          {filteredProducts.map((product) => (
+            <ProductCard
+              key={product.id}
+              id={product.id}
+              title={product.title}
+              brand={product.brand}
+              weight={product.weight}
+              country={product.country}
+              image={product.image}
 
-                description={product.description}
-                composition={product.composition}
-                storage={product.storage}
-                shelfLife={product.shelfLife}
-                packageType={product.packageType}
-                manufacturer={product.manufacturer}
-                websiteUrl={product.websiteUrl}
+              description={product.description}
+              composition={product.composition}
+              storage={product.storage}
+              shelfLife={product.shelfLife}
+              packageType={product.packageType}
+              manufacturer={product.manufacturer}
+              websiteUrl={product.websiteUrl}
 
-                badge={product.badge}
-              />
-            ))}
+              badge={product.badge}
+            />
+          ))}
 
-          </div>
-        )}
+        </div>
 
         <CartBar />
 
