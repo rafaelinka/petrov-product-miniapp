@@ -37,6 +37,9 @@ export default function CatalogPage() {
 
   const [search, setSearch] = useState("")
 
+  const [sort, setSort] =
+    useState("POPULAR")
+
   useEffect(() => {
     fetch("/api/products")
       .then((res) => res.json())
@@ -79,7 +82,7 @@ export default function CatalogPage() {
 
   // FILTERED PRODUCTS
   const filteredProducts = useMemo(() => {
-    return products.filter((p) => {
+    let filtered = products.filter((p) => {
       const categoryMatch =
         category === "Все"
           ? true
@@ -107,11 +110,39 @@ export default function CatalogPage() {
         searchMatch
       )
     })
+
+    // SORTING
+    if (sort === "NEW") {
+      filtered = filtered.sort((a, b) => {
+        if (a.badge === "NEW") return -1
+        if (b.badge === "NEW") return 1
+        return 0
+      })
+    }
+
+    if (sort === "PROMO") {
+      filtered = filtered.sort((a, b) => {
+        if (a.badge === "PROMO") return -1
+        if (b.badge === "PROMO") return 1
+        return 0
+      })
+    }
+
+    if (sort === "AZ") {
+      filtered = filtered.sort((a, b) =>
+        (a.title || "").localeCompare(
+          b.title || ""
+        )
+      )
+    }
+
+    return filtered
   }, [
     products,
     category,
     subcategory,
     search,
+    sort,
   ])
 
   return (
@@ -224,6 +255,98 @@ export default function CatalogPage() {
 
           </div>
 
+          {/* SORT */}
+          <div
+            className="
+              flex
+              gap-2
+              overflow-x-auto
+              px-3
+              py-3
+              bg-white
+              border-b
+              border-[#E2E8F0]
+            "
+          >
+
+            <button
+              onClick={() => setSort("POPULAR")}
+              className={`
+                px-3
+                py-2
+                rounded-full
+                text-xs
+                whitespace-nowrap
+
+                ${
+                  sort === "POPULAR"
+                    ? "bg-[#0B1F3A] text-white"
+                    : "bg-[#F5F7FA] text-[#0B1F3A]"
+                }
+              `}
+            >
+              Популярные
+            </button>
+
+            <button
+              onClick={() => setSort("NEW")}
+              className={`
+                px-3
+                py-2
+                rounded-full
+                text-xs
+                whitespace-nowrap
+
+                ${
+                  sort === "NEW"
+                    ? "bg-[#0B1F3A] text-white"
+                    : "bg-[#F5F7FA] text-[#0B1F3A]"
+                }
+              `}
+            >
+              🆕 Новинки
+            </button>
+
+            <button
+              onClick={() => setSort("PROMO")}
+              className={`
+                px-3
+                py-2
+                rounded-full
+                text-xs
+                whitespace-nowrap
+
+                ${
+                  sort === "PROMO"
+                    ? "bg-[#0B1F3A] text-white"
+                    : "bg-[#F5F7FA] text-[#0B1F3A]"
+                }
+              `}
+            >
+              🔥 Акции
+            </button>
+
+            <button
+              onClick={() => setSort("AZ")}
+              className={`
+                px-3
+                py-2
+                rounded-full
+                text-xs
+                whitespace-nowrap
+
+                ${
+                  sort === "AZ"
+                    ? "bg-[#0B1F3A] text-white"
+                    : "bg-[#F5F7FA] text-[#0B1F3A]"
+                }
+              `}
+            >
+              А-Я
+            </button>
+
+          </div>
+
           {/* SUBCATEGORY */}
           <div
             className="
@@ -266,6 +389,25 @@ export default function CatalogPage() {
           </div>
 
         </div>
+
+        {/* EMPTY */}
+        {filteredProducts.length === 0 && (
+          <div className="px-6 py-16 text-center">
+
+            <div className="text-5xl">
+              😕
+            </div>
+
+            <div className="mt-4 text-[#0B1F3A] font-semibold">
+              Ничего не найдено
+            </div>
+
+            <div className="mt-2 text-sm text-gray-500">
+              Попробуйте изменить запрос
+            </div>
+
+          </div>
+        )}
 
         {/* GRID */}
         <div className="grid grid-cols-2 gap-3 p-3 pb-28">
