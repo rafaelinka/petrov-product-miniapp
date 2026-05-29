@@ -10,6 +10,16 @@ import ProductModal from "@/components/ProductModal"
 
 import { useFavoritesStore } from "@/store/favoritesStore"
 
+type RelatedProduct = {
+  id: string
+  title: string
+  brand: string
+  weight?: string
+  country?: string
+  image?: string
+  badge?: string
+}
+
 type Props = {
   id: string
   title: string
@@ -29,6 +39,8 @@ type Props = {
   badge?: string
 
   relatedProducts?: string[]
+
+  allProducts?: RelatedProduct[]
 }
 
 export default function ProductCard({
@@ -50,6 +62,7 @@ export default function ProductCard({
   badge,
 
   relatedProducts,
+  allProducts,
 }: Props) {
   const {
     items,
@@ -317,6 +330,7 @@ export default function ProductCard({
         badge={badge}
 
         relatedProducts={relatedProducts}
+        allProducts={allProducts}
       />
     </>
   )

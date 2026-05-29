@@ -568,6 +568,8 @@ export default function CatalogPage() {
                 badge={product.badge}
 
                 relatedProducts={product.relatedProducts}
+
+                allProducts={products}
               />
             ))}
 
