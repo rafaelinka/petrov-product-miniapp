@@ -16,6 +16,7 @@ type Product = {
 export default function ManufacturersPage() {
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
+  const [search, setSearch] = useState("")
 
   useEffect(() => {
     fetch("/api/products")
@@ -52,6 +53,14 @@ export default function ManufacturersPage() {
       )
   }, [products])
 
+  const filteredManufacturers = useMemo(() => {
+    return manufacturers.filter((manufacturer) =>
+      manufacturer.name
+        .toLowerCase()
+        .includes(search.toLowerCase())
+    )
+  }, [manufacturers, search])
+
   return (
     <AppShell>
       <div className="p-4">
@@ -85,6 +94,32 @@ export default function ManufacturersPage() {
 
         </div>
 
+        {/* SEARCH */}
+        <div className="mt-5">
+
+          <input
+            type="text"
+            placeholder="Поиск производителя"
+            value={search}
+            onChange={(e) =>
+              setSearch(e.target.value)
+            }
+            className="
+              w-full
+              h-11
+              rounded-2xl
+              bg-white
+              px-4
+              text-sm
+              outline-none
+              border
+              border-[#E2E8F0]
+              focus:border-[#0B1F3A]
+            "
+          />
+
+        </div>
+
         {loading && (
           <div className="mt-6 space-y-3">
 
@@ -105,7 +140,7 @@ export default function ManufacturersPage() {
           </div>
         )}
 
-        {!loading && manufacturers.length === 0 && (
+        {!loading && filteredManufacturers.length === 0 && (
           <div className="mt-16 text-center">
 
             <div className="text-5xl">
@@ -117,16 +152,16 @@ export default function ManufacturersPage() {
             </div>
 
             <div className="mt-2 text-sm text-gray-500">
-              Проверьте поля manufacturer или brand в таблице
+              Попробуйте изменить запрос
             </div>
 
           </div>
         )}
 
-        {!loading && manufacturers.length > 0 && (
+        {!loading && filteredManufacturers.length > 0 && (
           <div className="mt-6 space-y-3">
 
-            {manufacturers.map((manufacturer) => (
+            {filteredManufacturers.map((manufacturer) => (
               <Link
                 key={manufacturer.name}
                 href={`/catalog?search=${encodeURIComponent(
