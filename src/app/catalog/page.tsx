@@ -27,6 +27,8 @@ type Product = {
   websiteUrl?: string
 
   badge?: string
+
+  relatedProducts?: string[]
 }
 
 export default function CatalogPage() {
@@ -66,7 +68,6 @@ export default function CatalogPage() {
       })
   }, [])
 
-  // SORT LABEL
   const sortLabel = useMemo(() => {
     if (sort === "POPULAR")
       return "Популярные"
@@ -83,7 +84,6 @@ export default function CatalogPage() {
     return "Сортировка"
   }, [sort])
 
-  // CATEGORIES
   const categories = useMemo(() => {
     const unique = [
       ...new Set(
@@ -96,7 +96,6 @@ export default function CatalogPage() {
     return ["Все", ...unique]
   }, [products])
 
-  // SUBCATEGORIES
   const subcategories = useMemo(() => {
     const filtered =
       category === "Все"
@@ -115,7 +114,6 @@ export default function CatalogPage() {
     ]
   }, [products, category])
 
-  // FILTERED PRODUCTS
   const filteredProducts = useMemo(() => {
     let filtered = products.filter((p) => {
       const categoryMatch =
@@ -152,7 +150,6 @@ export default function CatalogPage() {
       )
     })
 
-    // SORTING
     if (sort === "NEW") {
       filtered = filtered.sort((a, b) => {
         if (a.badge === "NEW") return -1
@@ -197,10 +194,8 @@ export default function CatalogPage() {
 
       <div className="w-full max-w-[420px]">
 
-        {/* STICKY HEADER */}
         <div className="sticky top-0 z-40 bg-[#F5F7FA]">
 
-          {/* TOP BAR */}
           <div
             className="
               bg-white
@@ -233,7 +228,6 @@ export default function CatalogPage() {
 
           </div>
 
-          {/* CATEGORY TABS */}
           <div
             className="
               flex
@@ -276,7 +270,6 @@ export default function CatalogPage() {
 
           </div>
 
-          {/* SEARCH */}
           <div className="bg-white px-3 py-3 border-b border-[#E2E8F0]">
 
             <input
@@ -302,7 +295,6 @@ export default function CatalogPage() {
 
           </div>
 
-          {/* SORT */}
           <div className="bg-white border-b border-[#E2E8F0] px-3 py-3 relative">
 
             <div className="flex items-center gap-2">
@@ -331,7 +323,6 @@ export default function CatalogPage() {
                 </span>
               </button>
 
-              {/* FAVORITES */}
               <button
                 onClick={() =>
                   setFavoritesOnly(
@@ -456,7 +447,6 @@ export default function CatalogPage() {
 
           </div>
 
-          {/* SUBCATEGORY */}
           <div
             className="
               flex
@@ -499,32 +489,90 @@ export default function CatalogPage() {
 
         </div>
 
-        {/* GRID */}
-        <div className="grid grid-cols-2 gap-3 p-3 pb-28">
+        {loading && (
+          <div className="grid grid-cols-2 gap-3 p-3 pb-28">
 
-          {filteredProducts.map((product) => (
-            <ProductCard
-              key={product.id}
-              id={product.id}
-              title={product.title}
-              brand={product.brand}
-              weight={product.weight}
-              country={product.country}
-              image={product.image}
+            {Array.from({ length: 6 }).map(
+              (_, i) => (
+                <div
+                  key={i}
+                  className="
+                    bg-white
+                    rounded-2xl
+                    overflow-hidden
+                    border
+                    border-[#E2E8F0]
+                    animate-pulse
+                  "
+                >
 
-              description={product.description}
-              composition={product.composition}
-              storage={product.storage}
-              shelfLife={product.shelfLife}
-              packageType={product.packageType}
-              manufacturer={product.manufacturer}
-              websiteUrl={product.websiteUrl}
+                  <div className="h-40 bg-[#E2E8F0]" />
 
-              badge={product.badge}
-            />
-          ))}
+                  <div className="p-3">
 
-        </div>
+                    <div className="h-4 bg-[#E2E8F0] rounded w-full" />
+
+                    <div className="h-4 bg-[#E2E8F0] rounded w-2/3 mt-2" />
+
+                    <div className="h-10 bg-[#E2E8F0] rounded-xl mt-4" />
+
+                  </div>
+
+                </div>
+              )
+            )}
+
+          </div>
+        )}
+
+        {!loading &&
+          filteredProducts.length === 0 && (
+            <div className="px-6 py-16 text-center">
+
+              <div className="text-5xl">
+                😕
+              </div>
+
+              <div className="mt-4 text-[#0B1F3A] font-semibold">
+                Ничего не найдено
+              </div>
+
+              <div className="mt-2 text-sm text-gray-500">
+                Попробуйте изменить запрос
+              </div>
+
+            </div>
+          )}
+
+        {!loading && (
+          <div className="grid grid-cols-2 gap-3 p-3 pb-28">
+
+            {filteredProducts.map((product) => (
+              <ProductCard
+                key={product.id}
+                id={product.id}
+                title={product.title}
+                brand={product.brand}
+                weight={product.weight}
+                country={product.country}
+                image={product.image}
+
+                description={product.description}
+                composition={product.composition}
+                storage={product.storage}
+                shelfLife={product.shelfLife}
+                packageType={product.packageType}
+                manufacturer={product.manufacturer}
+                websiteUrl={product.websiteUrl}
+
+                badge={product.badge}
+
+                relatedProducts={product.relatedProducts}
+              />
+            ))}
+
+          </div>
+        )}
 
         <CartBar />
 
