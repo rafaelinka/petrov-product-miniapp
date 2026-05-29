@@ -18,7 +18,6 @@ export async function GET() {
     })
 
     const sheetName = workbook.SheetNames[0]
-
     const sheet = workbook.Sheets[sheetName]
 
     const rawData = XLSX.utils.sheet_to_json<any>(sheet)
@@ -32,10 +31,16 @@ export async function GET() {
             .map((id: string) => id.trim())
             .filter(Boolean)
         : [],
+
+      similarProducts: row.similarProducts
+        ? String(row.similarProducts)
+            .split("|")
+            .map((id: string) => id.trim())
+            .filter(Boolean)
+        : [],
     }))
 
     return NextResponse.json(data)
-
   } catch (error) {
     console.error(error)
 

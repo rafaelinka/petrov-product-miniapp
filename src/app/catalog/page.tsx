@@ -29,6 +29,7 @@ type Product = {
   badge?: string
 
   relatedProducts?: string[]
+  similarProducts?: string[]
 }
 
 export default function CatalogPage() {
@@ -580,6 +581,7 @@ export default function CatalogPage() {
                 badge={product.badge}
 
                 relatedProducts={product.relatedProducts}
+                similarProducts={product.similarProducts}
 
                 allProducts={products}
               />

@@ -39,6 +39,7 @@ type Props = {
   badge?: string
 
   relatedProducts?: string[]
+  similarProducts?: string[]
 
   allProducts?: RelatedProduct[]
 }
@@ -62,6 +63,8 @@ export default function ProductCard({
   badge,
 
   relatedProducts,
+  similarProducts,
+
   allProducts,
 }: Props) {
   const {
@@ -97,10 +100,8 @@ export default function ProductCard({
         "
       >
 
-        {/* IMAGE */}
         <div className="bg-[#F5F7FA] relative">
 
-          {/* FAVORITE */}
           <button
             onClick={(e) => {
               e.stopPropagation()
@@ -126,7 +127,6 @@ export default function ProductCard({
             {favorite ? "♥" : "♡"}
           </button>
 
-          {/* BADGES */}
           {badge === "PROMO" && (
             <div
               className="
@@ -187,7 +187,6 @@ export default function ProductCard({
 
         </div>
 
-        {/* CONTENT */}
         <div className="p-3">
 
           <div className="min-h-[42px]">
@@ -224,7 +223,6 @@ export default function ProductCard({
 
           </div>
 
-          {/* ACTION */}
           <div
             className="mt-3"
             onClick={(e) => e.stopPropagation()}
@@ -330,6 +328,8 @@ export default function ProductCard({
         badge={badge}
 
         relatedProducts={relatedProducts}
+        similarProducts={similarProducts}
+
         allProducts={allProducts}
       />
     </>

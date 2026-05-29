@@ -37,6 +37,8 @@ type Props = {
   badge?: string
 
   relatedProducts?: string[]
+  similarProducts?: string[]
+
   allProducts?: RelatedProduct[]
 }
 
@@ -61,6 +63,8 @@ export default function ProductModal({
   badge,
 
   relatedProducts,
+  similarProducts,
+
   allProducts,
 }: Props) {
   const {
@@ -71,23 +75,177 @@ export default function ProductModal({
 
   if (!open) return null
 
+  const getProductsByIds = (
+    ids?: string[]
+  ): RelatedProduct[] => {
+    if (!ids || !allProducts) return []
+
+    return ids
+      .map((productId) =>
+        allProducts.find(
+          (product) =>
+            String(product.id) ===
+            String(productId)
+        )
+      )
+      .filter(
+        (
+          product
+        ): product is RelatedProduct =>
+          Boolean(product)
+      )
+  }
+
   const relatedItems =
-    relatedProducts && allProducts
-      ? relatedProducts
-          .map((relatedId) =>
-            allProducts.find(
-              (product) =>
-                String(product.id) ===
-                String(relatedId)
+    getProductsByIds(relatedProducts)
+
+  const similarItems =
+    getProductsByIds(similarProducts)
+
+  const renderProductRow = (
+    title: string,
+    products: RelatedProduct[]
+  ) => {
+    if (products.length === 0) return null
+
+    return (
+      <div className="mt-6">
+
+        <div className="text-sm font-semibold text-[#0B1F3A]">
+          {title}
+        </div>
+
+        <div
+          className="
+            mt-3
+            flex
+            gap-3
+            overflow-x-auto
+            pb-2
+          "
+        >
+
+          {products.map((product) => {
+            const cartItem = items.find(
+              (item) =>
+                item.id === product.id
             )
-          )
-          .filter(
-            (
-              product
-            ): product is RelatedProduct =>
-              Boolean(product)
-          )
-      : []
+
+            return (
+              <div
+                key={product.id}
+                className="
+                  min-w-[140px]
+                  max-w-[140px]
+                  rounded-2xl
+                  border
+                  border-[#E2E8F0]
+                  bg-white
+                  overflow-hidden
+                "
+              >
+
+                <div className="relative bg-[#F5F7FA]">
+
+                  {product.badge && (
+                    <div
+                      className="
+                        absolute
+                        top-2
+                        left-2
+                        z-10
+                        bg-[#D64545]
+                        text-white
+                        text-[9px]
+                        font-semibold
+                        px-2
+                        py-1
+                        rounded-full
+                      "
+                    >
+                      {product.badge === "PROMO"
+                        ? "АКЦИЯ"
+                        : product.badge === "NEW"
+                        ? "NEW"
+                        : "ХИТ"}
+                    </div>
+                  )}
+
+                  {product.image ? (
+                    <Image
+                      src={`/products/${product.image}`}
+                      alt={product.title}
+                      width={300}
+                      height={220}
+                      className="
+                        w-full
+                        h-24
+                        object-cover
+                      "
+                    />
+                  ) : (
+                    <div className="h-24 flex items-center justify-center text-[11px] text-gray-400">
+                      Нет фото
+                    </div>
+                  )}
+
+                </div>
+
+                <div className="p-2">
+
+                  <div className="text-xs font-semibold text-[#1A1A1A] line-clamp-2 min-h-[32px]">
+                    {product.title}
+                  </div>
+
+                  <div className="text-[11px] text-gray-500 mt-1 line-clamp-1">
+                    {product.brand}
+                  </div>
+
+                  {product.weight && (
+                    <div className="text-[11px] text-gray-500 mt-1">
+                      {product.weight}
+                    </div>
+                  )}
+
+                  <button
+                    onClick={() => {
+                      if (cartItem) {
+                        increaseQty(product.id)
+                      } else {
+                        addItem({
+                          id: product.id,
+                          title: product.title,
+                          qty: 1,
+                        })
+                      }
+                    }}
+                    className="
+                      mt-2
+                      w-full
+                      h-8
+                      rounded-xl
+                      bg-[#0B1F3A]
+                      text-white
+                      text-xs
+                      font-medium
+                    "
+                  >
+                    {cartItem
+                      ? `В заявке: ${cartItem.qty}`
+                      : "+ В заявку"}
+                  </button>
+
+                </div>
+
+              </div>
+            )
+          })}
+
+        </div>
+
+      </div>
+    )
+  }
 
   return (
     <div
@@ -114,10 +272,8 @@ export default function ProductModal({
         "
       >
 
-        {/* IMAGE */}
         <div className="relative">
 
-          {/* BADGE */}
           {badge && (
             <div className="absolute top-4 left-4 z-10">
 
@@ -164,7 +320,6 @@ export default function ProductModal({
             <div className="h-[280px] bg-[#F5F7FA]" />
           )}
 
-          {/* CLOSE */}
           <button
             onClick={onClose}
             className="
@@ -186,10 +341,8 @@ export default function ProductModal({
 
         </div>
 
-        {/* CONTENT */}
         <div className="p-4">
 
-          {/* TITLE */}
           <div>
 
             <h2 className="text-xl font-semibold text-[#0B1F3A]">
@@ -202,7 +355,6 @@ export default function ProductModal({
 
           </div>
 
-          {/* INFO */}
           <div className="mt-4 flex flex-wrap gap-2">
 
             {country && (
@@ -252,7 +404,6 @@ export default function ProductModal({
 
           </div>
 
-          {/* DESCRIPTION */}
           {description && (
             <div className="mt-5">
 
@@ -267,7 +418,6 @@ export default function ProductModal({
             </div>
           )}
 
-          {/* COMPOSITION */}
           {composition && (
             <div className="mt-5">
 
@@ -282,7 +432,6 @@ export default function ProductModal({
             </div>
           )}
 
-          {/* EXTRA INFO */}
           {(storage || packageType || manufacturer) && (
             <div className="mt-5 space-y-2">
 
@@ -316,7 +465,6 @@ export default function ProductModal({
             </div>
           )}
 
-          {/* WEBSITE */}
           {websiteUrl && (
             <a
               href={websiteUrl}
@@ -340,143 +488,14 @@ export default function ProductModal({
             </a>
           )}
 
-          {/* RELATED PRODUCTS */}
-          {relatedItems.length > 0 && (
-            <div className="mt-6">
+          {renderProductRow(
+            "Часто покупают вместе",
+            relatedItems
+          )}
 
-              <div className="text-sm font-semibold text-[#0B1F3A]">
-                Часто покупают вместе
-              </div>
-
-              <div
-                className="
-                  mt-3
-                  flex
-                  gap-3
-                  overflow-x-auto
-                  pb-2
-                "
-              >
-
-                {relatedItems.map((product) => {
-                  const cartItem = items.find(
-                    (item) =>
-                      item.id === product.id
-                  )
-
-                  return (
-                    <div
-                      key={product.id}
-                      className="
-                        min-w-[140px]
-                        max-w-[140px]
-                        rounded-2xl
-                        border
-                        border-[#E2E8F0]
-                        bg-white
-                        overflow-hidden
-                      "
-                    >
-
-                      <div className="relative bg-[#F5F7FA]">
-
-                        {product.badge && (
-                          <div
-                            className="
-                              absolute
-                              top-2
-                              left-2
-                              z-10
-                              bg-[#D64545]
-                              text-white
-                              text-[9px]
-                              font-semibold
-                              px-2
-                              py-1
-                              rounded-full
-                            "
-                          >
-                            {product.badge === "PROMO"
-                              ? "АКЦИЯ"
-                              : product.badge === "NEW"
-                              ? "NEW"
-                              : "ХИТ"}
-                          </div>
-                        )}
-
-                        {product.image ? (
-                          <Image
-                            src={`/products/${product.image}`}
-                            alt={product.title}
-                            width={300}
-                            height={220}
-                            className="
-                              w-full
-                              h-24
-                              object-cover
-                            "
-                          />
-                        ) : (
-                          <div className="h-24 flex items-center justify-center text-[11px] text-gray-400">
-                            Нет фото
-                          </div>
-                        )}
-
-                      </div>
-
-                      <div className="p-2">
-
-                        <div className="text-xs font-semibold text-[#1A1A1A] line-clamp-2 min-h-[32px]">
-                          {product.title}
-                        </div>
-
-                        <div className="text-[11px] text-gray-500 mt-1 line-clamp-1">
-                          {product.brand}
-                        </div>
-
-                        {product.weight && (
-                          <div className="text-[11px] text-gray-500 mt-1">
-                            {product.weight}
-                          </div>
-                        )}
-
-                        <button
-                          onClick={() => {
-                            if (cartItem) {
-                              increaseQty(product.id)
-                            } else {
-                              addItem({
-                                id: product.id,
-                                title: product.title,
-                                qty: 1,
-                              })
-                            }
-                          }}
-                          className="
-                            mt-2
-                            w-full
-                            h-8
-                            rounded-xl
-                            bg-[#0B1F3A]
-                            text-white
-                            text-xs
-                            font-medium
-                          "
-                        >
-                          {cartItem
-                            ? `В заявке: ${cartItem.qty}`
-                            : "+ В заявку"}
-                        </button>
-
-                      </div>
-
-                    </div>
-                  )
-                })}
-
-              </div>
-
-            </div>
+          {renderProductRow(
+            "Похожие товары",
+            similarItems
           )}
 
         </div>
