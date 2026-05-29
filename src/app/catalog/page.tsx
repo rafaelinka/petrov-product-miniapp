@@ -8,8 +8,6 @@ import CartBar from "@/components/CartBar"
 
 import { useFavoritesStore } from "@/store/favoritesStore"
 
-import { useSearchParams } from "next/navigation"
-
 type Product = {
   id: string
   title: string
@@ -34,8 +32,6 @@ type Product = {
 }
 
 export default function CatalogPage() {
-  const searchParams = useSearchParams()
-
   const [products, setProducts] = useState<Product[]>([])
 
   const [loading, setLoading] =
@@ -62,13 +58,16 @@ export default function CatalogPage() {
     useFavoritesStore()
 
   useEffect(() => {
-  const searchFromUrl =
-    searchParams.get("search")
+    const params = new URLSearchParams(
+      window.location.search
+    )
 
-  if (searchFromUrl) {
-    setSearch(searchFromUrl)
-  }
-}, [searchParams])
+    const searchFromUrl = params.get("search")
+
+    if (searchFromUrl) {
+      setSearch(searchFromUrl)
+    }
+  }, [])
 
   useEffect(() => {
     fetch("/api/products")
