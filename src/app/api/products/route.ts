@@ -21,7 +21,18 @@ export async function GET() {
 
     const sheet = workbook.Sheets[sheetName]
 
-    const data = XLSX.utils.sheet_to_json(sheet)
+    const rawData = XLSX.utils.sheet_to_json<any>(sheet)
+
+    const data = rawData.map((row) => ({
+      ...row,
+
+      relatedProducts: row.relatedProducts
+        ? String(row.relatedProducts)
+            .split("|")
+            .map((id: string) => id.trim())
+            .filter(Boolean)
+        : [],
+    }))
 
     return NextResponse.json(data)
 

@@ -23,6 +23,8 @@ type Props = {
   websiteUrl?: string
 
   badge?: string
+
+  relatedProducts?: string[]
 }
 
 export default function ProductModal({
@@ -39,11 +41,13 @@ export default function ProductModal({
   composition,
   storage,
   shelfLife,
- packageType,
+  packageType,
   manufacturer,
   websiteUrl,
 
   badge,
+
+  relatedProducts,
 }: Props) {
   if (!open) return null
 
@@ -279,6 +283,7 @@ export default function ProductModal({
             <a
               href={websiteUrl}
               target="_blank"
+              rel="noreferrer"
               className="
                 mt-5
                 h-12
@@ -296,6 +301,21 @@ export default function ProductModal({
               Подробнее на сайте
             </a>
           )}
+
+          {/* RELATED PRODUCTS READY */}
+          {relatedProducts &&
+            relatedProducts.length > 0 && (
+              <div className="mt-6">
+                <div className="text-sm font-semibold text-[#0B1F3A]">
+                  Часто покупают вместе
+                </div>
+
+                <div className="text-xs text-gray-500 mt-1">
+                  Найдено связанных товаров:{" "}
+                  {relatedProducts.length}
+                </div>
+              </div>
+            )}
 
         </div>
 

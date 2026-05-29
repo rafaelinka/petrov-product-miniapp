@@ -27,6 +27,8 @@ type Props = {
   websiteUrl?: string
 
   badge?: string
+
+  relatedProducts?: string[]
 }
 
 export default function ProductCard({
@@ -46,6 +48,8 @@ export default function ProductCard({
   websiteUrl,
 
   badge,
+
+  relatedProducts,
 }: Props) {
   const {
     items,
@@ -109,7 +113,7 @@ export default function ProductCard({
             {favorite ? "♥" : "♡"}
           </button>
 
-          {/* BADGE */}
+          {/* BADGES */}
           {badge === "PROMO" && (
             <div
               className="
@@ -174,11 +178,9 @@ export default function ProductCard({
         <div className="p-3">
 
           <div className="min-h-[42px]">
-
             <div className="text-sm font-semibold text-[#1A1A1A] line-clamp-2">
               {title}
             </div>
-
           </div>
 
           <div className="text-xs text-gray-500 mt-1">
@@ -293,7 +295,6 @@ export default function ProductCard({
 
       </div>
 
-      {/* MODAL */}
       <ProductModal
         open={open}
         onClose={() => setOpen(false)}
@@ -314,6 +315,8 @@ export default function ProductCard({
         websiteUrl={websiteUrl}
 
         badge={badge}
+
+        relatedProducts={relatedProducts}
       />
     </>
   )
