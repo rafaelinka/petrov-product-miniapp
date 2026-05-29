@@ -76,6 +76,47 @@ export default function Page() {
 
           </Link>
 
+          {/* ПРОИЗВОДИТЕЛИ */}
+          <Link href="/manufacturers">
+
+            <div
+              className="
+                bg-white
+                border
+                border-[#E2E8F0]
+                rounded-2xl
+                p-4
+                active:scale-[0.99]
+                transition
+                cursor-pointer
+                shadow-sm
+              "
+            >
+
+              <div className="flex items-center justify-between">
+
+                <div>
+
+                  <div className="text-[#0B1F3A] font-medium text-sm">
+                    Производители
+                  </div>
+
+                  <div className="text-xs text-gray-500 mt-1">
+                    Быстрый поиск по брендам и заводам
+                  </div>
+
+                </div>
+
+                <div className="text-xl">
+                  🏭
+                </div>
+
+              </div>
+
+            </div>
+
+          </Link>
+
           {/* КОНТАКТЫ */}
           <Link href="/contacts">
 
